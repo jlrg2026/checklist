@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
+<title>CHECKLIST ABC · Altas y Bajas</title>
+<style>
+/* ---------- TOKENS ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f2f2f7; --bg-blur:rgba(242,242,247,.82);
+  --surface:#fff; --surface-2:#f6f6f9;
+  --text:#1c1c1e; --text-2:#6c6c70; --text-3:#8e8e93;
+  --border:rgba(60,60,67,.12);
+  --primary:#0a84ff; --primary-2:#5856d6;
+  --success:#34c759; --danger:#ff3b30; --warning:#ff9500;
+  --success-bg:rgba(52,199,89,.12);
+  --success-bd:rgba(52,199,89,.25);
+  --danger-bg:rgba(255,59,48,.12);
+  --danger-bd:rgba(255,59,48,.25);
+  --primary-bg:rgba(10,132,255,.10);
+  --primary-bd:rgba(10,132,255,.22);
+  --radius:18px; --radius-sm:12px;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.06);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.18);
+}
+[data-theme="dark"]{
+  --bg:#000; --bg-blur:rgba(0,0,0,.72);
+  --surface:#1c1c1e; --surface-2:#2c2c2e;
+  --text:#fff; --text-2:#c7c7cc; --text-3:#8e8e93;
+  --border:rgba(84,84,88,.4);
+  --success-bg:rgba(52,199,89,.18);
+  --success-bd:rgba(52,199,89,.35);
+  --danger-bg:rgba(255,59,48,.18);
+  --danger-bd:rgba(255,59,48,.35);
+  --primary-bg:rgba(10,132,255,.18);
+  --primary-bd:rgba(10,132,255,.35);
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.7);
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  transition:background .3s,color .3s;
+  min-height:100dvh;
+  padding-bottom:40px;
+}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+svg{display:block;flex-shrink:0}
+input{font-family:inherit}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  background:var(--bg-blur);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,#0a84ff,#5856d6);
+  display:grid;place-items:center;color:#fff;
+  box-shadow:0 4px 12px rgba(10,132,255,.35);
+}
+.brand-name{font-weight:700;font-size:15px;letter-spacing:-.01em}
+.brand-sub{font-size:11px;color:var(--text-3);margin-top:-1px}
+.top-actions{display:flex;gap:4px}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  color:var(--text);transition:background .15s;
+}
+.icon-btn:active{background:var(--surface-2)}
+
+/* ---------- MAIN ---------- */
+.main{max-width:1280px;margin:0 auto;padding:20px}
+
+/* ---------- HERO ---------- */
+.hero{
+  background:linear-gradient(135deg,#0a84ff 0%,#5856d6 100%);
+  border-radius:22px;padding:24px;color:#fff;
+  margin-bottom:18px;
+  box-shadow:0 12px 30px rgba(10,132,255,.28);
+  position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%);
+  border-radius:50%;
+}
+.hero-title{font-size:26px;font-weight:700;letter-spacing:-.03em;position:relative}
+.hero-sub{font-size:14px;opacity:.9;margin-top:4px;position:relative}
+.hero-stats{display:flex;gap:28px;margin-top:18px;position:relative;flex-wrap:wrap}
+.hstat{display:flex;flex-direction:column;gap:2px}
+.hstat-val{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.hstat-label{font-size:12px;opacity:.85;font-weight:500}
+
+/* ---------- MODE TOGGLE ---------- */
+.mode-toggle{
+  display:flex;gap:4px;margin-bottom:16px;
+  background:var(--surface);padding:5px;border-radius:14px;
+  box-shadow:var(--shadow);width:fit-content;
+}
+.mode-btn{
+  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;
+  color:var(--text-2);transition:all .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.mode-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(10,132,255,.3)}
+.mode-btn.active-alta{background:var(--success);color:#fff;box-shadow:0 4px 12px rgba(52,199,89,.3)}
+.mode-btn.active-baja{background:var(--danger);color:#fff;box-shadow:0 4px 12px rgba(255,59,48,.3)}
+
+/* ---------- LEGEND ---------- */
+.legend{
+  display:flex;gap:18px;flex-wrap:wrap;
+  margin-bottom:16px;font-size:12px;color:var(--text-2);font-weight:500;
+}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:3px}
+
+/* ---------- TOOLBAR ---------- */
+.toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.search{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border-radius:12px;
+  padding:11px 14px;box-shadow:var(--shadow);color:var(--text-3);
+  flex:1;min-width:220px;
+}
+.search input{
+  border:none;background:transparent;outline:none;flex:1;
+  font-size:15px;color:var(--text);
+}
+
+/* ---------- GRID ---------- */
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- CARD ---------- */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;
+  display:flex;flex-direction:column;
+  border:1px solid var(--border);
+  transition:transform .15s, box-shadow .15s;
+  animation:cardIn .4s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+
+.card-head{
+  padding:16px 18px;display:flex;align-items:flex-start;gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.dept-dot{
+  width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:6px;
+  box-shadow:0 0 0 4px rgba(0,0,0,.04);
+}
+.card-title-wrap{flex:1;min-width:0}
+.card-title{
+  font-size:16px;font-weight:700;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.ventas-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:rgba(255,45,85,.15);color:#ff2d55;letter-spacing:.02em;
+}
+.positions{
+  font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.4;
+}
+
+/* ---------- SECTIONS ---------- */
+.section{padding:14px 18px;border-bottom:1px solid var(--border)}
+.section:last-child{border-bottom:none}
+.section.alta-sec{background:rgba(52,199,89,.03)}
+.section.baja-sec{background:rgba(255,59,48,.03)}
+.section.devices-sec{background:rgba(10,132,255,.03)}
+
+.section-title{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.section-title.alta{color:var(--success)}
+.section-title.baja{color:var(--danger)}
+.section-title.devices{color:var(--primary)}
+
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.sys-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 9px;border-radius:8px;
+  font-size:11.5px;font-weight:600;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.sys-chip.alta{background:var(--success-bg);color:var(--success);border-color:var(--success-bd)}
+.sys-chip.baja{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
+.sys-chip svg{width:13px;height:13px}
+
+/* Chips con enlace (Alta) */
+a.sys-chip{text-decoration:none;cursor:pointer;transition:transform .12s, filter .12s}
+a.sys-chip:hover{filter:brightness(.96);transform:translateY(-1px)}
+a.sys-chip:active{transform:translateY(0)}
+a.sys-chip::after{
+  content:"";width:9px;height:9px;margin-left:2px;opacity:.7;
+  background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
+          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
+}
+
+/* Devices compactos */
+.devices-row{display:flex;flex-wrap:wrap;gap:8px 14px}
+.dev-item{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:500;color:var(--text-2);
+}
+.dev-item svg{width:15px;height:15px;color:var(--primary)}
+
+/* ---------- MODE VISIBILITY ---------- */
+body.mode-alta .baja-sec{display:none}
+body.mode-baja .alta-sec{display:none}
+
+/* ---------- EMPTY ---------- */
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:60px 20px;color:var(--text-3);text-align:center;
+  grid-column:1/-1;
+}
+.empty p{font-size:14px;font-weight:500}
+
+/* ---------- FOOTER ---------- */
+.footer-note{
+  text-align:center;color:var(--text-3);font-size:12px;
+  margin-top:32px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+/* ---------- PRINT ---------- */
+@media print{
+  .topbar,.hero,.toolbar,.mode-toggle,.legend{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .main{padding:0;max-width:none}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{
+    break-inside:avoid;box-shadow:none;border:1px solid #ccc;
+    animation:none;
+  }
+  .card:hover{transform:none;box-shadow:none}
+  .section.alta-sec,.section.baja-sec{display:block!important;background:#fff!important}
+  .section.devices-sec{background:#fff!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-logo" id="brand-logo"></div>
+    <div>
+      <div class="brand-name">CHECKLIST</div>
+      <div class="brand-sub">Altas y Bajas</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="icon-btn" id="print-btn" title="Imprimir"><span id="print-icon"></span></button>
+    <button class="icon-btn" id="theme-btn" title="Cambiar tema"><span id="theme-icon"></span></button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="hero">
+    <div class="hero-title">CHECKLIST visual de Altas y Bajas</div>
+    <div class="hero-sub">Sistemas y dispositivos a gestionar por departamento</div>
+    <div class="hero-stats" id="hero-stats"></div>
+  </div>
+
+  <div class="mode-toggle" id="mode-toggle">
+    <button class="mode-btn active" data-mode="all">Ver todo</button>
+    <button class="mode-btn" data-mode="alta">Solo Altas</button>
+    <button class="mode-btn" data-mode="baja">Solo Bajas</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--success)"></span>Alta / habilitar</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>Baja / deshabilitar</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--primary)"></span>Dispositivos</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <span id="search-icon"></span>
+      <input placeholder="Buscar departamento, puesto o sistema..." id="search-input">
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="footer-note">Referencia interna · Departamento de TI</div>
+</main>
+
+<script>
+/* =========================================================
+   ICONS
+   ========================================================= */
+const ICONS = {
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
+  cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  laptop:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
+  monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+  keyboard:'<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="14" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'
+};
+function svg(name, size=14){
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
+
+/* =========================================================
+   DATOS
+   ========================================================= */
+const DEPARTMENTS = [
+  { name:'Admon',              color:'#0a84ff', isVentas:false, positions:['Administrador de Oficina','Auxiliar Administrativo'] },
+  { name:'Admon y Finanzas',   color:'#5856d6', isVentas:false, positions:['Director de Administración y Finanzas'] },
+  { name:'DG',                 color:'#af52de', isVentas:false, positions:['Asistente de Dirección y Coord de eventos','Director de Operaciones','Director General'] },
+  { name:'Digital',            color:'#ff6b9d', isVentas:true,  positions:['Asesor Ventas Digitales'] },
+  { name:'Dir Médica',         color:'#34c759', isVentas:false, positions:['Coordinadora de Regulatoria','Director Médico','Gerente de Entrenamiento','Gerente Médico'] },
+  { name:'Finanzas',           color:'#ff9500', isVentas:false, positions:['Auxiliar de Tesorería','Contador','Cuentas por cobrar/facturación'] },
+  { name:'IT',                 color:'#00c7be', isVentas:false, positions:['Base de datos'] },
+  { name:'Logística',          color:'#ff9f0a', isVentas:false, positions:['Administrativo Logística','Auxiliar de Almacén','Encargado de Almacén','Jefe de Logística'] },
+  { name:'MKT',                color:'#ff3b30', isVentas:false, positions:['Asistente de Mercadotecnia','Director de Mercadotecnia','Diseñador Jr.','Diseñador Sr.','Especialista Comunicación Audiovisual','Especialista Senior de Mercadotecnia Digital','Gerente de Mercadotecnia Digital','Gerente de Producto Portafolio'] },
+  { name:'Recursos Humanos',   color:'#e91e63', isVentas:false, positions:['Gerente Recursos Humanos'] },
+  { name:'Servicios Generales',color:'#8e8e93', isVentas:false, positions:['Auxiliar Administrativo','Servicios generales'] },
+  { name:'Ventas',             color:'#ff2d55', isVentas:true,  positions:['Asesor de Ventas','Coordinadora Nacional de Ventas / Gerente Regional de Ventas','Gerente Regional de Ventas'] }
+];
+
+/* ---------- PERFIL ESTÁNDAR (no Ventas) ---------- */
+const SYSTEMS_STD_ALTA = [
+  { label:'Alta de correo Dermavan', icon:'mail', href:'https://cpanel.dermavan.mx/' }
+];
+const SYSTEMS_STD_BAJA = [
+  { label:'Baja correo Dermavan',    icon:'mail' }
+];
+
+/* ---------- PERFIL VENTAS ---------- */
+const SYSTEMS_VEN_ALTA = [
+  { label:'Alta correo Dermavan',          icon:'mail',      href:'https://cpanel.dermavan.mx/' },
+  { label:'Alta Dermavanlab',              icon:'cloud',     href:'https://dermavanlab.com/login/index.php' },
+  { label:'Alta usuario SAP',              icon:'briefcase', href:'mailto:basesdatos@dermavan.mx' },
+  { label:'Alta Cotizador SAP',            icon:'file',      href:'mailto:alfonso@bluesolut.com;noemi_coronilla@grupoatic.com.mx;alexis_vazquez@grupoatic.com.mx' },
+  { label:'Alta Gmail control médico',     icon:'mail' },
+  { label:'Alta CRM Harmony',              icon:'users',     href:'mailto:ntomas@smart-scale.com' }
+];
+const SYSTEMS_VEN_BAJA = [
+  { label:'Baja correo Dermavan',          icon:'mail' },
+  { label:'Baja Dermavanlab',              icon:'cloud' },
+  { label:'Baja usuario SAP',              icon:'briefcase' },
+  { label:'Baja Cotizador SAP',            icon:'file' },
+  { label:'Baja Gmail control médico',     icon:'mail' },
+  { label:'Baja CRM Harmony',              icon:'users' }
+];
+
+const DEVICES = [
+  { label:'Laptop',         icon:'laptop' },
+  { label:'Monitor',        icon:'monitor' },
+  { label:'Teléfono móvil', icon:'phone' },
+  { label:'Periférico',     icon:'keyboard' },
+  { label:'Otro',           icon:'box' }
+];
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function renderAltaChip(s){
+  if (s.href){
+    const isMail = s.href.startsWith('mailto:');
+    const target = isMail ? '' : ' target="_blank" rel="noopener noreferrer"';
+    return `<a class="sys-chip alta" href="${s.href}"${target}>${svg(s.icon)}${s.label}</a>`;
+  }
+  return `<span class="sys-chip alta">${svg(s.icon)}${s.label}</span>`;
+}
+
+function buildCard(dept){
+  const alta = dept.isVentas ? SYSTEMS_VEN_ALTA : SYSTEMS_STD_ALTA;
+  const baja = dept.isVentas ? SYSTEMS_VEN_BAJA : SYSTEMS_STD_BAJA;
+
+  const searchText = [
+    dept.name,
+    ...dept.positions,
+    ...alta.map(s=>s.label),
+    ...baja.map(s=>s.label),
+    ...DEVICES.map(d=>d.label)
+  ].join(' ').toLowerCase();
+
+  return `
+    <div class="card" data-search="${searchText}">
+      <div class="card-head">
+        <span class="dept-dot" style="background:${dept.color}"></span>
+        <div class="card-title-wrap">
+          <div class="card-title">
+            ${dept.name}
+            ${dept.isVentas ? '<span class="ventas-badge">VENTAS</span>' : ''}
+          </div>
+          <div class="positions">${dept.positions.join(' · ')}</div>
+        </div>
+      </div>
+
+      <div class="section alta-sec">
+        <div class="section-title alta">${svg('check')} Alta · habilitar (${alta.length})</div>
+        <div class="chips">
+          ${alta.map(renderAltaChip).join('')}
+        </div>
+      </div>
+
+      <div class="section baja-sec">
+        <div class="section-title baja">${svg('x')} Baja · deshabilitar (${baja.length})</div>
+        <div class="chips">
+          ${baja.map(s => `<span class="sys-chip baja">${svg(s.icon)}${s.label}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="section devices-sec">
+        <div class="section-title devices">${svg('box')} Dispositivos · asignar / recuperar</div>
+        <div class="devices-row">
+          ${DEVICES.map(d => `<span class="dev-item">${svg(d.icon)}${d.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function render(){
+  document.getElementById('grid').innerHTML = DEPARTMENTS.map(buildCard).join('');
+}
+
+/* =========================================================
+   FILTRO
+   ========================================================= */
+function filterCards(){
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const cards = [...document.querySelectorAll('.card')];
+  let visible = 0;
+
+  cards.forEach(card => {
+    const match = !q || card.dataset.search.includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+
+  const emptyEl = document.getElementById('empty-state');
+  if (visible === 0 && !emptyEl){
+    const el = document.createElement('div');
+    el.className = 'empty';
+    el.id = 'empty-state';
+    el.innerHTML = `${svg('search', 40)}<p>Sin resultados para "${q}"</p>`;
+    document.getElementById('grid').appendChild(el);
+  } else if (visible > 0 && emptyEl){
+    emptyEl.remove();
+  }
+}
+
+/* =========================================================
+   MODO (Altas / Bajas / Todo)
+   ========================================================= */
+function setMode(mode){
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.remove('active', 'active-alta', 'active-baja');
+    if (btn.dataset.mode === mode){
+      if (mode === 'alta') btn.classList.add('active-alta');
+      else if (mode === 'baja') btn.classList.add('active-baja');
+      else btn.classList.add('active');
+    }
+  });
+  document.body.classList.remove('mode-alta', 'mode-baja');
+  if (mode === 'alta') document.body.classList.add('mode-alta');
+  if (mode === 'baja') document.body.classList.add('mode-baja');
+}
+
+/* =========================================================
+   TEMA
+   ========================================================= */
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('it-guide-theme', next); } catch(e) {}
+  updateThemeIcon();
+}
+function updateThemeIcon(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('theme-icon').innerHTML = svg(isDark ? 'sun' : 'moon', 20);
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', isDark ? '#000000' : '#f2f2f7');
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init(){
+  try {
+    const saved = localStorage.getItem('it-guide-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch(e){}
+
+  document.getElementById('brand-logo').innerHTML = svg('shield', 20);
+  document.getElementById('print-icon').innerHTML = svg('printer', 20);
+  document.getElementById('search-icon').innerHTML = svg('search', 18);
+  updateThemeIcon();
+
+  document.getElementById('hero-stats').innerHTML = `
+    <div class="hstat"><span class="hstat-val">${DEPARTMENTS.length}</span><span class="hstat-label">Departamentos</span></div>
+    <div class="hstat"><span class="hstat-val">2</span><span class="hstat-label">Perfiles</span></div>
+    <div class="hstat"><span class="hstat-val">${DEVICES.length}</span><span class="hstat-label">Dispositivos</span></div>
+  `;
+
+  render();
+
+  document.getElementById('search-input').addEventListener('input', filterCards);
+  document.getElementById('print-btn').addEventListener('click', () => window.print());
+  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+}
+init();
+</script>
+</body>
+</html>
