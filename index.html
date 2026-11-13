@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
-<head><!DOCTYPE html>
-<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -275,932 +273,11 @@ body.mode-baja .alta-sec{display:none}
   padding:10px 12px;font-size:14px;color:var(--text);outline:none;width:100%;
 }
 .fld input:focus,.fld select:focus{border-color:var(--primary)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.seg{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;width:fit-content;max-width:100%;flex-wrap:wrap}
-.seg button{padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;color:var(--text-2)}
-.seg button.on{background:var(--primary);color:#fff}
-.seg button.on.alta{background:var(--success)}
-.seg button.on.baja{background:var(--danger)}
-.seg button.on.cambio{background:var(--warning)}
-.ckl{display:flex;flex-direction:column;gap:6px}
-.ck{
-  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;
-  background:var(--surface-2);border:1px solid var(--border);font-size:13px;cursor:pointer;
-}
-.ck input{width:17px;height:17px;accent-color:var(--success)}
-.ck b{font-size:10px;letter-spacing:.05em;padding:2px 7px;border-radius:6px;color:#fff}
-.ck b.ALTA,.ck b.ASIGNAR{background:var(--success)}
-.ck b.BAJA,.ck b.RECUPERAR{background:var(--danger)}
-.ck b.REVISAR{background:var(--warning)}
-.hint{font-size:12px;color:var(--text-3)}
-.btn{padding:10px 16px;border-radius:11px;font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--border)}
-.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn.dng{color:var(--danger)}
-
-/* ---------- PRINT ---------- */
-@media print{
-  .topbar,.hero,.toolbar,.mode-toggle,.legend,.modal{display:none!important}
-  body{background:#fff;color:#000;padding:0}
-  .main{padding:0;max-width:none}
-  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .card{
-    break-inside:avoid;box-shadow:none;border:1px solid #ccc;
-    animation:none;
-  }
-  .card:hover{transform:none;box-shadow:none}
-  .section.alta-sec,.section.baja-sec{display:block!important;background:#fff!important}
-  .section.devices-sec{background:#fff!important}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-</style>
-</head>
-<body>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-logo" id="brand-logo"></div>
-    <div>
-      <div class="brand-name">CHECKLIST</div>
-      <div class="brand-sub">Altas y Bajas</div>
-    </div>
-  </div>
-  <div class="top-actions">
-    <button class="icon-btn" id="print-btn" title="Imprimir"><span id="print-icon"></span></button>
-    <button class="icon-btn" id="pdf-btn" title="Reporte PDF"><span id="pdf-icon"></span></button>
-    <button class="icon-btn" id="theme-btn" title="Cambiar tema"><span id="theme-icon"></span></button>
-  </div>
-</header>
-
-<main class="main">
-  <div class="hero">
-    <div class="hero-title">CHECKLIST visual de Altas y Bajas</div>
-    <div class="hero-sub">Sistemas y dispositivos a gestionar por departamento</div>
-    <div class="hero-stats" id="hero-stats"></div>
-  </div>
-
-  <div class="mode-toggle" id="mode-toggle">
-    <button class="mode-btn active" data-mode="all">Ver todo</button>
-    <button class="mode-btn" data-mode="alta">Solo Altas</button>
-    <button class="mode-btn" data-mode="baja">Solo Bajas</button>
-  </div>
-
-  <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:var(--success)"></span>Alta / habilitar</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>Baja / deshabilitar</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--primary)"></span>Dispositivos</div>
-  </div>
-
-  <div class="toolbar">
-    <div class="search">
-      <span id="search-icon"></span>
-      <input placeholder="Buscar departamento, puesto o sistema..." id="search-input">
-    </div>
-  </div>
-
-  <div class="grid" id="grid"></div>
-
-  <div class="footer-note">Referencia interna · Departamento de TI</div>
-</main>
-
-<!-- ======== MODAL: REPORTE PDF ======== -->
-<div class="modal" id="rep-modal" hidden>
-  <div class="sheet">
-    <div class="sheet-head">
-      <div>
-        <h2>Reporte PDF profesional</h2>
-        <p>Altas, bajas y cambios por área o por empleado</p>
-      </div>
-      <button class="icon-btn" id="rep-close" title="Cerrar"><span id="rep-close-icon"></span></button>
-    </div>
-    <div class="sheet-body">
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Movimiento</div>
-        <div class="seg" id="seg-tipo">
-          <button data-v="alta" class="on alta">Alta</button>
-          <button data-v="baja">Baja</button>
-          <button data-v="cambio">Cambio</button>
-        </div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Aplicar sobre</div>
-        <div class="seg" id="seg-scope">
-          <button data-v="area" class="on">Área</button>
-          <button data-v="emp">Empleado</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="fld"><label id="lbl-area" for="f-area">Área</label><select id="f-area"></select></div>
-        <div class="fld" id="wrap-dest" hidden><label for="f-dest">Área destino</label><select id="f-dest"></select></div>
-      </div>
-      <div class="row" id="wrap-emp" hidden>
-        <div class="fld"><label for="f-nombre">Nombre del empleado</label><input id="f-nombre" placeholder="Nombre completo"></div>
-        <div class="fld"><label for="f-puesto">Puesto</label><select id="f-puesto"></select></div>
-      </div>
-      <div class="row">
-        <div class="fld"><label for="f-fecha">Fecha</label><input type="date" id="f-fecha"></div>
-        <div class="fld"><label for="f-resp">Responsable de TI</label><input id="f-resp" placeholder="Nombre del responsable"></div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Marca lo ya realizado (aparecerá en el listado del PDF)</div>
-        <div class="ckl" id="ckl"></div>
-        <p class="hint" id="rep-hint" style="margin-top:6px"></p>
-      </div>
-    </div>
-    <div class="sheet-foot">
-      <button class="btn dng" id="hist-clear">Limpiar historial</button>
-      <button class="btn" id="hist-pdf">PDF del historial</button>
-      <button class="btn pri" id="gen-pdf">Generar PDF</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script>
-/* =========================================================
-   ICONS
-   ========================================================= */
-const ICONS = {
-  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
-  cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
-  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
-  globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
-  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
-  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
-  pdf:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 12v6"/><polyline points="9 15 12 18 15 15"/>',
-  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  laptop:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
-  monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
-  phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
-  tablet:'<rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
-  keyboard:'<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="14" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/>',
-  check:'<polyline points="20 6 9 17 4 12"/>',
-  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
-  sun:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
-  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'
-};
-function svg(name, size=14){
-  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
-}
-
-/* =========================================================
-   DATOS
-   ========================================================= */
-const DEPARTMENTS = [
-  { name:'Admon',              color:'#0a84ff', isVentas:false, positions:['Administrador de Oficina','Auxiliar Administrativo'] },
-  { name:'Admon y Finanzas',   color:'#5856d6', isVentas:false, positions:['Director de Administración y Finanzas'] },
-  { name:'DG',                 color:'#af52de', isVentas:false, positions:['Asistente de Dirección y Coord de eventos','Director de Operaciones','Director General'] },
-  { name:'Digital',            color:'#ff6b9d', isVentas:true,  positions:['Asesor Ventas Digitales'] },
-  { name:'Dir Médica',         color:'#34c759', isVentas:false, positions:['Coordinadora de Regulatoria','Director Médico','Gerente de Entrenamiento','Gerente Médico'] },
-  { name:'Finanzas',           color:'#ff9500', isVentas:false, positions:['Auxiliar de Tesorería','Contador','Cuentas por cobrar/facturación'] },
-  { name:'IT',                 color:'#00c7be', isVentas:false, positions:['Base de datos'] },
-  { name:'Logística',          color:'#ff9f0a', isVentas:false, positions:['Administrativo Logística','Auxiliar de Almacén','Encargado de Almacén','Jefe de Logística'] },
-  { name:'MKT',                color:'#ff3b30', isVentas:false, positions:['Asistente de Mercadotecnia','Director de Mercadotecnia','Diseñador Jr.','Diseñador Sr.','Especialista Comunicación Audiovisual','Especialista Senior de Mercadotecnia Digital','Gerente de Mercadotecnia Digital','Gerente de Producto Portafolio'] },
-  { name:'Recursos Humanos',   color:'#e91e63', isVentas:false, positions:['Gerente Recursos Humanos'] },
-  { name:'Servicios Generales',color:'#8e8e93', isVentas:false, positions:['Auxiliar Administrativo','Servicios generales'] },
-  { name:'Ventas',             color:'#ff2d55', isVentas:true,  positions:['Asesor de Ventas','Coordinadora Nacional de Ventas / Gerente Regional de Ventas','Gerente Regional de Ventas'] }
-];
-
-/* ---------- PERFIL ESTÁNDAR (no Ventas) ---------- */
-const SYSTEMS_STD_ALTA = [
-  { label:'Alta de correo Dermavan', icon:'mail', href:'https://cpanel.dermavan.mx/' }
-];
-const SYSTEMS_STD_BAJA = [
-  { label:'Baja correo Dermavan',    icon:'mail' }
-];
-
-/* ---------- PERFIL VENTAS ---------- */
-const SYSTEMS_VEN_ALTA = [
-  { label:'Alta correo Dermavan',          icon:'mail',      href:'https://cpanel.dermavan.mx/' },
-  { label:'Alta Dermavanlab',              icon:'cloud',     href:'https://dermavanlab.com/login/index.php' },
-  { label:'Alta usuario SAP',              icon:'briefcase', href:'mailto:basesdatos@dermavan.mx' },
-  { label:'Alta Cotizador SAP',            icon:'file',      href:'mailto:alfonso@bluesolut.com;noemi_coronilla@grupoatic.com.mx;alexis_vazquez@grupoatic.com.mx' },
-  { label:'Alta Gmail control médico',     icon:'mail' },
-  { label:'Alta CRM Harmony',              icon:'users',     href:'mailto:ntomas@smart-scale.com' }
-];
-const SYSTEMS_VEN_BAJA = [
-  { label:'Baja correo Dermavan',          icon:'mail' },
-  { label:'Baja Dermavanlab',              icon:'cloud' },
-  { label:'Baja usuario SAP',              icon:'briefcase' },
-  { label:'Baja Cotizador SAP',            icon:'file' },
-  { label:'Baja Gmail control médico',     icon:'mail' },
-  { label:'Baja CRM Harmony',              icon:'users' }
-];
-
-const DEVICES = [
-  { label:'Laptop',         icon:'laptop' },
-  { label:'Monitor',        icon:'monitor' },
-  { label:'Teléfono móvil', icon:'phone' },
-  { label:'iPhone',         icon:'phone' },
-  { label:'iPad',           icon:'tablet' },
-  { label:'Periférico',     icon:'keyboard' },
-  { label:'Otro',           icon:'box' }
-];
-
-/* =========================================================
-   RENDER
-   ========================================================= */
-function renderAltaChip(s){
-  if (s.href){
-    const isMail = s.href.startsWith('mailto:');
-    const target = isMail ? '' : ' target="_blank" rel="noopener noreferrer"';
-    return `<a class="sys-chip alta" href="${s.href}"${target}>${svg(s.icon)}${s.label}</a>`;
-  }
-  return `<span class="sys-chip alta">${svg(s.icon)}${s.label}</span>`;
-}
-
-function buildCard(dept){
-  const alta = dept.isVentas ? SYSTEMS_VEN_ALTA : SYSTEMS_STD_ALTA;
-  const baja = dept.isVentas ? SYSTEMS_VEN_BAJA : SYSTEMS_STD_BAJA;
-
-  const searchText = [
-    dept.name,
-    ...dept.positions,
-    ...alta.map(s=>s.label),
-    ...baja.map(s=>s.label),
-    ...DEVICES.map(d=>d.label)
-  ].join(' ').toLowerCase();
-
-  return `
-    <div class="card" data-search="${searchText}">
-      <div class="card-head">
-        <span class="dept-dot" style="background:${dept.color}"></span>
-        <div class="card-title-wrap">
-          <div class="card-title">
-            ${dept.name}
-            ${dept.isVentas ? '<span class="ventas-badge">VENTAS</span>' : ''}
-          </div>
-          <div class="positions">${dept.positions.join(' · ')}</div>
-        </div>
-      </div>
-
-      <div class="section alta-sec">
-        <div class="section-title alta">${svg('check')} Alta · habilitar (${alta.length})</div>
-        <div class="chips">
-          ${alta.map(renderAltaChip).join('')}
-        </div>
-      </div>
-
-      <div class="section baja-sec">
-        <div class="section-title baja">${svg('x')} Baja · deshabilitar (${baja.length})</div>
-        <div class="chips">
-          ${baja.map(s => `<span class="sys-chip baja">${svg(s.icon)}${s.label}</span>`).join('')}
-        </div>
-      </div>
-
-      <div class="section devices-sec">
-        <div class="section-title devices">${svg('box')} Dispositivos · asignar / recuperar</div>
-        <div class="devices-row">
-          ${DEVICES.map(d => `<span class="dev-item">${svg(d.icon)}${d.label}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function render(){
-  document.getElementById('grid').innerHTML = DEPARTMENTS.map(buildCard).join('');
-}
-
-/* =========================================================
-   FILTRO
-   ========================================================= */
-function filterCards(){
-  const q = document.getElementById('search-input').value.toLowerCase().trim();
-  const cards = [...document.querySelectorAll('.card')];
-  let visible = 0;
-
-  cards.forEach(card => {
-    const match = !q || card.dataset.search.includes(q);
-    card.style.display = match ? '' : 'none';
-    if (match) visible++;
-  });
-
-  const emptyEl = document.getElementById('empty-state');
-  if (visible === 0 && !emptyEl){
-    const el = document.createElement('div');
-    el.className = 'empty';
-    el.id = 'empty-state';
-    el.innerHTML = `${svg('search', 40)}<p>Sin resultados para "${q}"</p>`;
-    document.getElementById('grid').appendChild(el);
-  } else if (visible > 0 && emptyEl){
-    emptyEl.remove();
-  }
-}
-
-/* =========================================================
-   MODO (Altas / Bajas / Todo)
-   ========================================================= */
-function setMode(mode){
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.classList.remove('active', 'active-alta', 'active-baja');
-    if (btn.dataset.mode === mode){
-      if (mode === 'alta') btn.classList.add('active-alta');
-      else if (mode === 'baja') btn.classList.add('active-baja');
-      else btn.classList.add('active');
-    }
-  });
-  document.body.classList.remove('mode-alta', 'mode-baja');
-  if (mode === 'alta') document.body.classList.add('mode-alta');
-  if (mode === 'baja') document.body.classList.add('mode-baja');
-}
-
-/* =========================================================
-   TEMA
-   ========================================================= */
-function toggleTheme(){
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('it-guide-theme', next); } catch(e) {}
-  updateThemeIcon();
-}
-function updateThemeIcon(){
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('theme-icon').innerHTML = svg(isDark ? 'sun' : 'moon', 20);
-  document.querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', isDark ? '#000000' : '#f2f2f7');
-}
-
-/* =========================================================
-   REPORTE PDF (Alta / Baja / Cambio)
-   ========================================================= */
-const REP = { tipo:'alta', scope:'area' };
-const LOG_KEY = 'it-guide-log';
-let memLog = [];
-const $ = id => document.getElementById(id);
-const TIPO_TXT = { alta:'ALTA', baja:'BAJA', cambio:'CAMBIO' };
-const baseName = l => l.replace(/^(Alta|Baja)( de)?\s+/i,'').trim().toLowerCase();
-const getDept = n => DEPARTMENTS.find(d => d.name === n);
-const sysOf = (d,t) => d.isVentas ? (t==='alta'?SYSTEMS_VEN_ALTA:SYSTEMS_VEN_BAJA) : (t==='alta'?SYSTEMS_STD_ALTA:SYSTEMS_STD_BAJA);
-const detail = h => !h ? 'Gestion interna' : h.startsWith('mailto:') ? h.slice(7).split(';').join(', ') : h;
-const fmtDate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
-const slug = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_|_$/g,'');
-
-function loadLog(){
-  try { return JSON.parse(localStorage.getItem(LOG_KEY)||'[]'); } catch(e){ return memLog; }
-}
-function saveLog(arr){
-  memLog = arr;
-  try { localStorage.setItem(LOG_KEY, JSON.stringify(arr)); } catch(e){}
-}
-
-/* Construye la lista de acciones según movimiento y áreas */
-function curItems(){
-  const o = getDept($('f-area').value);
-  const dst = getDept($('f-dest').value);
-  const items = [];
-  if (!o) return items;
-  if (REP.tipo === 'alta'){
-    sysOf(o,'alta').forEach(s => items.push({ app:s.label, acc:'ALTA', det:detail(s.href) }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'ASIGNAR', det:'Dispositivo' }));
-  } else if (REP.tipo === 'baja'){
-    sysOf(o,'baja').forEach(s => items.push({ app:s.label, acc:'BAJA', det:'Deshabilitar acceso' }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'RECUPERAR', det:'Dispositivo' }));
-  } else if (dst){
-    const keepD = sysOf(dst,'alta').map(s => baseName(s.label));
-    const keepO = sysOf(o,'alta').map(s => baseName(s.label));
-    sysOf(o,'baja').filter(s => !keepD.includes(baseName(s.label)))
-      .forEach(s => items.push({ app:s.label, acc:'BAJA', det:'Ya no aplica en ' + dst.name }));
-    sysOf(dst,'alta').filter(s => !keepO.includes(baseName(s.label)))
-      .forEach(s => items.push({ app:s.label, acc:'ALTA', det:detail(s.href) }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'REVISAR', det:'Reasignar si aplica' }));
-  }
-  return items;
-}
-
-function fillSelects(){
-  const opts = DEPARTMENTS.map(d => `<option>${d.name}</option>`).join('');
-  $('f-area').innerHTML = opts;
-  $('f-dest').innerHTML = opts;
-  if (DEPARTMENTS.length > 1) $('f-dest').selectedIndex = 1;
-  fillPuestos();
-}
-function fillPuestos(){
-  const d = getDept(REP.tipo==='cambio' ? $('f-dest').value : $('f-area').value);
-  $('f-puesto').innerHTML = (d ? d.positions : []).map(p => `<option>${p}</option>`).join('');
-}
-function renderChecklist(){
-  const items = curItems();
-  $('ckl').innerHTML = items.length
-    ? items.map((it,i) => `<label class="ck"><input type="checkbox" data-i="${i}"><b class="${it.acc}">${it.acc}</b><span>${it.app}</span></label>`).join('')
-    : '<p class="hint">Sin acciones para esta selección.</p>';
-  $('rep-hint').textContent = (REP.tipo==='cambio' && $('f-area').value===$('f-dest').value)
-    ? 'El área origen y destino son iguales: solo se mostrará la revisión de dispositivos.' : '';
-}
-function syncForm(){
-  const cambio = REP.tipo === 'cambio', emp = REP.scope === 'emp';
-  $('wrap-dest').hidden = !cambio;
-  $('wrap-emp').hidden = !emp;
-  $('lbl-area').textContent = cambio ? 'Área origen' : 'Área';
-  fillPuestos();
-  renderChecklist();
-}
-function segBind(id, key){
-  $(id).addEventListener('click', e => {
-    const b = e.target.closest('button'); if(!b) return;
-    REP[key] = b.dataset.v;
-    $(id).querySelectorAll('button').forEach(x => x.className = x===b ? 'on ' + (key==='tipo'?b.dataset.v:'') : '');
-    syncForm();
-  });
-}
-function openModal(){
-  $('rep-modal').hidden = false;
-  if (!$('f-fecha').value) $('f-fecha').value = new Date().toISOString().slice(0,10);
-  syncForm();
-}
-
-/* Encabezado y pie comunes del PDF */
-function pdfFrame(doc, title, sub){
-  const W = doc.internal.pageSize.getWidth();
-  doc.setFillColor(10,132,255); doc.rect(0,0,W,26,'F');
-  doc.setFillColor(88,86,214); doc.rect(W*0.6,0,W*0.4,26,'F');
-  doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
-  doc.text(title, 14, 12);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-  doc.text(sub, 14, 19);
-  doc.text('Departamento de TI', W-14, 12, { align:'right' });
-  doc.text('Generado: ' + new Date().toLocaleString('es-MX'), W-14, 19, { align:'right' });
-  doc.setTextColor(0);
-}
-function pdfFooters(doc){
-  const n = doc.getNumberOfPages(), W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-  for (let i=1;i<=n;i++){
-    doc.setPage(i); doc.setFontSize(8); doc.setTextColor(130);
-    doc.setDrawColor(210); doc.line(14,H-12,W-14,H-12);
-    doc.text('CHECKLIST ABC · Altas y Bajas · Documento interno', 14, H-7);
-    doc.text(`Pagina ${i} de ${n}`, W-14, H-7, { align:'right' });
-  }
-}
-function accColor(a){
-  return a==='ALTA'||a==='ASIGNAR' ? [52,199,89] : a==='BAJA'||a==='RECUPERAR' ? [255,59,48] : [255,149,0];
-}
-function ensureLib(){
-  if (!(window.jspdf && window.jspdf.jsPDF)){
-    alert('No se pudo cargar la librería PDF (jsPDF). Verifica tu conexión a internet e inténtalo de nuevo.');
-    return false;
-  }
-  return true;
-}
-
-/* Genera el reporte del movimiento actual */
-function generatePDF(){
-  if (!ensureLib()) return;
-  const tipo = REP.tipo, emp = REP.scope === 'emp';
-  const nombre = $('f-nombre').value.trim();
-  if (emp && !nombre){ alert('Escribe el nombre del empleado.'); $('f-nombre').focus(); return; }
-  const o = getDept($('f-area').value), dst = getDept($('f-dest').value);
-  const items = curItems();
-  if (!items.length){ alert('No hay acciones para generar.'); return; }
-  const checks = [...document.querySelectorAll('#ckl input')].map(c => c.checked);
-  const fecha = fmtDate($('f-fecha').value), resp = $('f-resp').value.trim();
-  const puesto = emp ? $('f-puesto').value : '';
-  const hechos = checks.filter(Boolean).length;
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'letter' });
-  const W = doc.internal.pageSize.getWidth();
-  pdfFrame(doc, 'Reporte de ' + (tipo==='alta'?'Alta':tipo==='baja'?'Baja':'Cambio'),
-    'Control de accesos y dispositivos · ' + (emp ? 'Por empleado' : 'Por area'));
-
-  /* Bloque de datos */
-  const meta = [
-    ['Movimiento', TIPO_TXT[tipo]],
-    ['Alcance', emp ? 'Empleado' : 'Area'],
-    [tipo==='cambio' ? 'Area origen' : 'Area', o.name],
-  ];
-  if (tipo==='cambio') meta.push(['Area destino', dst.name]);
-  if (emp){ meta.push(['Empleado', nombre]); meta.push(['Puesto', puesto]); }
-  else meta.push(['Puestos del area', (tipo==='cambio'?dst:o).positions.join(' · ')]);
-  meta.push(['Fecha', fecha || '-'], ['Responsable TI', resp || '-']);
-  doc.autoTable({
-    startY:32, body:meta, theme:'plain', margin:{ left:14, right:14 },
-    styles:{ fontSize:9.5, cellPadding:1.8 },
-    columnStyles:{ 0:{ fontStyle:'bold', textColor:[108,108,112], cellWidth:38 } },
-  });
-
-  /* Resumen */
-  let y = doc.lastAutoTable.finalY + 4;
-  doc.setFillColor(242,242,247); doc.roundedRect(14,y,W-28,13,2,2,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  const verbo = tipo==='alta' ? 'dados de alta' : tipo==='baja' ? 'dados de baja' : 'procesados';
-  doc.text(`Listado de elementos ${verbo}: ${hechos} de ${items.length} realizados · ${items.length-hechos} pendientes`, 18, y+8);
-
-  /* Tabla principal */
-  const body = items.map((it,i) => [i+1, it.app, it.acc, it.det, checks[i] ? 'Realizado' : 'Pendiente', '']);
-  doc.autoTable({
-    startY:y+18, margin:{ left:14, right:14, bottom:18 },
-    head:[['#','Sistema / App / Dispositivo','Accion','Enlace / Contacto / Detalle','Estatus','Hecho']],
-    body, theme:'grid',
-    headStyles:{ fillColor:[10,132,255], textColor:255, fontSize:9 },
-    styles:{ fontSize:8.5, cellPadding:2.4, valign:'middle', overflow:'linebreak' },
-    alternateRowStyles:{ fillColor:[248,248,251] },
-    columnStyles:{ 0:{cellWidth:8,halign:'center'}, 1:{cellWidth:50}, 2:{cellWidth:22,halign:'center',fontStyle:'bold'}, 4:{cellWidth:22,halign:'center'}, 5:{cellWidth:14} },
-    didParseCell(d){
-      if (d.section!=='body') return;
-      if (d.column.index===2) d.cell.styles.textColor = accColor(d.cell.raw);
-      if (d.column.index===4) d.cell.styles.textColor = checks[d.row.index] ? [52,150,80] : [255,149,0];
-    },
-    didDrawCell(d){
-      if (d.section!=='body' || d.column.index!==5) return;
-      const s = 4, cx = d.cell.x + (d.cell.width-s)/2, cy = d.cell.y + (d.cell.height-s)/2;
-      doc.setDrawColor(90); doc.setLineWidth(.3); doc.rect(cx,cy,s,s);
-      if (checks[d.row.index]){
-        doc.setDrawColor(52,199,89); doc.setLineWidth(.7);
-        doc.line(cx+.8,cy+2.2,cx+1.7,cy+3.2); doc.line(cx+1.7,cy+3.2,cx+3.3,cy+.8);
-      }
-    }
-  });
-
-  /* Firmas */
-  let fy = doc.lastAutoTable.finalY + 26;
-  const H = doc.internal.pageSize.getHeight();
-  if (fy > H-30){ doc.addPage(); fy = 40; }
-  doc.setDrawColor(120); doc.setLineWidth(.3);
-  doc.line(20,fy,85,fy); doc.line(W-85,fy,W-20,fy);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90);
-  doc.text('Responsable de TI' + (resp ? ': ' + resp : ''), 52.5, fy+5, { align:'center' });
-  doc.text(emp ? 'Empleado: ' + nombre : 'Jefe de area / Recursos Humanos', W-52.5, fy+5, { align:'center' });
-
-  pdfFooters(doc);
-  doc.save(`Reporte_${TIPO_TXT[tipo]}_${slug(emp ? nombre : o.name)}_${new Date().toISOString().slice(0,10)}.pdf`);
-
-  /* Guardar en historial */
-  const log = loadLog();
-  log.push({
-    fecha: $('f-fecha').value || new Date().toISOString().slice(0,10), tipo, area:o.name,
-    destino: tipo==='cambio' ? dst.name : '', nombre: emp ? nombre : '', puesto,
-    total: items.length, hechos,
-    apps: items.filter((_,i)=>checks[i]).map(i => i.app)
-  });
-  saveLog(log);
-}
-
-/* PDF del historial de movimientos, filtrado por movimiento / área / nombre */
-function historyPDF(){
-  if (!ensureLib()) return;
-  const area = $('f-area').value, q = $('f-nombre').value.trim().toLowerCase(), emp = REP.scope === 'emp';
-  let rows = loadLog().filter(r => r.tipo === REP.tipo);
-  rows = emp
-    ? rows.filter(r => !q || r.nombre.toLowerCase().includes(q))
-    : rows.filter(r => r.area === area || r.destino === area);
-  if (!rows.length){ alert('No hay movimientos de ' + TIPO_TXT[REP.tipo] + ' registrados con ese filtro.'); return; }
-  rows.sort((a,b) => a.fecha < b.fecha ? 1 : -1);
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'letter', orientation:'landscape' });
-  const verbo = REP.tipo==='alta' ? 'dados de alta' : REP.tipo==='baja' ? 'dados de baja' : 'con cambio';
-  pdfFrame(doc, 'Historial de ' + TIPO_TXT[REP.tipo],
-    'Listado de empleados / areas ' + verbo + ' · Filtro: ' + (emp ? (q || 'todos los empleados') : area));
-  doc.autoTable({
-    startY:32, margin:{ left:14, right:14, bottom:18 }, theme:'grid',
-    head:[['Fecha','Movimiento','Empleado / Area','Puesto','Avance','Apps realizadas']],
-    body: rows.map(r => [
-      fmtDate(r.fecha), TIPO_TXT[r.tipo],
-      (r.nombre ? r.nombre + ' · ' : '') + r.area + (r.destino ? ' -> ' + r.destino : ''),
-      r.puesto || '-', `${r.hechos}/${r.total}`, r.apps.length ? r.apps.join(', ') : 'Ninguna marcada'
-    ]),
-    headStyles:{ fillColor:[10,132,255], textColor:255, fontSize:9 },
-    styles:{ fontSize:8.5, cellPadding:2.4 },
-    alternateRowStyles:{ fillColor:[248,248,251] },
-    columnStyles:{ 0:{cellWidth:22}, 1:{cellWidth:24,fontStyle:'bold'}, 4:{cellWidth:18,halign:'center'} },
-    didParseCell(d){ if (d.section==='body' && d.column.index===1) d.cell.styles.textColor = accColor(d.cell.raw==='CAMBIO'?'REVISAR':d.cell.raw); }
-  });
-  pdfFooters(doc);
-  doc.save(`Historial_${TIPO_TXT[REP.tipo]}_${new Date().toISOString().slice(0,10)}.pdf`);
-}
-
-function initReport(){
-  $('pdf-icon').innerHTML = svg('pdf', 20);
-  $('rep-close-icon').innerHTML = svg('x', 20);
-  fillSelects();
-  segBind('seg-tipo','tipo');
-  segBind('seg-scope','scope');
-  $('pdf-btn').addEventListener('click', openModal);
-  $('rep-close').addEventListener('click', () => $('rep-modal').hidden = true);
-  $('rep-modal').addEventListener('click', e => { if (e.target.id === 'rep-modal') $('rep-modal').hidden = true; });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('rep-modal').hidden = true; });
-  $('f-area').addEventListener('change', () => { fillPuestos(); renderChecklist(); });
-  $('f-dest').addEventListener('change', () => { fillPuestos(); renderChecklist(); });
-  $('gen-pdf').addEventListener('click', generatePDF);
-  $('hist-pdf').addEventListener('click', historyPDF);
-  $('hist-clear').addEventListener('click', () => {
-    if (confirm('¿Borrar todo el historial de movimientos?')) saveLog([]);
-  });
-}
-
-/* =========================================================
-   INIT
-   ========================================================= */
-function init(){
-  try {
-    const saved = localStorage.getItem('it-guide-theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
-  } catch(e){}
-
-  document.getElementById('brand-logo').innerHTML = svg('shield', 20);
-  document.getElementById('print-icon').innerHTML = svg('printer', 20);
-  document.getElementById('search-icon').innerHTML = svg('search', 18);
-  updateThemeIcon();
-
-  document.getElementById('hero-stats').innerHTML = `
-    <div class="hstat"><span class="hstat-val">${DEPARTMENTS.length}</span><span class="hstat-label">Departamentos</span></div>
-    <div class="hstat"><span class="hstat-val">2</span><span class="hstat-label">Perfiles</span></div>
-    <div class="hstat"><span class="hstat-val">${DEVICES.length}</span><span class="hstat-label">Dispositivos</span></div>
-  `;
-
-  render();
-
-  document.getElementById('search-input').addEventListener('input', filterCards);
-  document.getElementById('print-btn').addEventListener('click', () => window.print());
-  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => setMode(btn.dataset.mode));
-  });
-  initReport();
-}
-init();
-</script>
-</body>
-</html>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
-<title>CHECKLIST ABC · Altas y Bajas</title>
-<style>
-/* ---------- TOKENS ---------- */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#f2f2f7; --bg-blur:rgba(242,242,247,.82);
-  --surface:#fff; --surface-2:#f6f6f9;
-  --text:#1c1c1e; --text-2:#6c6c70; --text-3:#8e8e93;
-  --border:rgba(60,60,67,.12);
-  --primary:#0a84ff; --primary-2:#5856d6;
-  --success:#34c759; --danger:#ff3b30; --warning:#ff9500;
-  --success-bg:rgba(52,199,89,.12);
-  --success-bd:rgba(52,199,89,.25);
-  --danger-bg:rgba(255,59,48,.12);
-  --danger-bd:rgba(255,59,48,.25);
-  --primary-bg:rgba(10,132,255,.10);
-  --primary-bd:rgba(10,132,255,.22);
-  --radius:18px; --radius-sm:12px;
-  --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.06);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.18);
-}
-[data-theme="dark"]{
-  --bg:#000; --bg-blur:rgba(0,0,0,.72);
-  --surface:#1c1c1e; --surface-2:#2c2c2e;
-  --text:#fff; --text-2:#c7c7cc; --text-3:#8e8e93;
-  --border:rgba(84,84,88,.4);
-  --success-bg:rgba(52,199,89,.18);
-  --success-bd:rgba(52,199,89,.35);
-  --danger-bg:rgba(255,59,48,.18);
-  --danger-bd:rgba(255,59,48,.35);
-  --primary-bg:rgba(10,132,255,.18);
-  --primary-bd:rgba(10,132,255,.35);
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px rgba(0,0,0,.4);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.7);
-}
-html,body{height:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg);color:var(--text);
-  font-size:15px;line-height:1.4;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  transition:background .3s,color .3s;
-  min-height:100dvh;
-  padding-bottom:40px;
-}
-button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
-svg{display:block;flex-shrink:0}
-input,select,textarea{font-family:inherit}
-
-/* ---------- TOPBAR ---------- */
-.topbar{
-  position:sticky;top:0;z-index:50;
-  height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  background:var(--bg-blur);
-  backdrop-filter:saturate(180%) blur(20px);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.brand{display:flex;align-items:center;gap:10px}
-.brand-logo{
-  width:34px;height:34px;border-radius:10px;
-  background:linear-gradient(135deg,#0a84ff,#5856d6);
-  display:grid;place-items:center;color:#fff;
-  box-shadow:0 4px 12px rgba(10,132,255,.35);
-}
-.brand-name{font-weight:700;font-size:15px;letter-spacing:-.01em}
-.brand-sub{font-size:11px;color:var(--text-3);margin-top:-1px}
-.top-actions{display:flex;gap:4px}
-.icon-btn{
-  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
-  color:var(--text);transition:background .15s;
-}
-.icon-btn:active{background:var(--surface-2)}
-
-/* ---------- MAIN ---------- */
-.main{max-width:1280px;margin:0 auto;padding:20px}
-
-/* ---------- HERO ---------- */
-.hero{
-  background:linear-gradient(135deg,#0a84ff 0%,#5856d6 100%);
-  border-radius:22px;padding:24px;color:#fff;
-  margin-bottom:18px;
-  box-shadow:0 12px 30px rgba(10,132,255,.28);
-  position:relative;overflow:hidden;
-}
-.hero::after{
-  content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
-  background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%);
-  border-radius:50%;
-}
-.hero-title{font-size:26px;font-weight:700;letter-spacing:-.03em;position:relative}
-.hero-sub{font-size:14px;opacity:.9;margin-top:4px;position:relative}
-.hero-stats{display:flex;gap:28px;margin-top:18px;position:relative;flex-wrap:wrap}
-.hstat{display:flex;flex-direction:column;gap:2px}
-.hstat-val{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1}
-.hstat-label{font-size:12px;opacity:.85;font-weight:500}
-
-/* ---------- MODE TOGGLE ---------- */
-.mode-toggle{
-  display:flex;gap:4px;margin-bottom:16px;
-  background:var(--surface);padding:5px;border-radius:14px;
-  box-shadow:var(--shadow);width:fit-content;
-}
-.mode-btn{
-  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;
-  color:var(--text-2);transition:all .2s;
-  display:flex;align-items:center;gap:6px;
-}
-.mode-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(10,132,255,.3)}
-.mode-btn.active-alta{background:var(--success);color:#fff;box-shadow:0 4px 12px rgba(52,199,89,.3)}
-.mode-btn.active-baja{background:var(--danger);color:#fff;box-shadow:0 4px 12px rgba(255,59,48,.3)}
-.mode-btn.active-cambio{background:var(--warning);color:#fff;box-shadow:0 4px 12px rgba(255,149,0,.3)}
-
-/* ---------- LEGEND ---------- */
-.legend{
-  display:flex;gap:18px;flex-wrap:wrap;
-  margin-bottom:16px;font-size:12px;color:var(--text-2);font-weight:500;
-}
-.legend-item{display:flex;align-items:center;gap:6px}
-.legend-dot{width:10px;height:10px;border-radius:3px}
-
-/* ---------- TOOLBAR ---------- */
-.toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.search{
-  display:flex;align-items:center;gap:8px;
-  background:var(--surface);border-radius:12px;
-  padding:11px 14px;box-shadow:var(--shadow);color:var(--text-3);
-  flex:1;min-width:220px;
-}
-.search input{
-  border:none;background:transparent;outline:none;flex:1;
-  font-size:15px;color:var(--text);
-}
-
-/* ---------- GRID ---------- */
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
-
-/* ---------- CARD ---------- */
-.card{
-  background:var(--surface);border-radius:var(--radius);
-  box-shadow:var(--shadow);overflow:hidden;
-  display:flex;flex-direction:column;
-  border:1px solid var(--border);
-  transition:transform .15s, box-shadow .15s;
-  animation:cardIn .4s cubic-bezier(.2,.8,.2,1) both;
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
-
-.card-head{
-  padding:16px 18px;display:flex;align-items:flex-start;gap:12px;
-  border-bottom:1px solid var(--border);
-}
-.dept-dot{
-  width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:6px;
-  box-shadow:0 0 0 4px rgba(0,0,0,.04);
-}
-.card-title-wrap{flex:1;min-width:0}
-.card-title{
-  font-size:16px;font-weight:700;letter-spacing:-.01em;
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-}
-.ventas-badge{
-  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
-  background:rgba(255,45,85,.15);color:#ff2d55;letter-spacing:.02em;
-}
-.positions{
-  font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.4;
-}
-
-/* ---------- SECTIONS ---------- */
-.section{padding:14px 18px;border-bottom:1px solid var(--border)}
-.section:last-child{border-bottom:none}
-.section.alta-sec{background:rgba(52,199,89,.03)}
-.section.baja-sec{background:rgba(255,59,48,.03)}
-.section.devices-sec{background:rgba(10,132,255,.03)}
-
-.section-title{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;margin-bottom:10px;
-}
-.section-title.alta{color:var(--success)}
-.section-title.baja{color:var(--danger)}
-.section-title.devices{color:var(--primary)}
-
-.chips{display:flex;flex-wrap:wrap;gap:5px}
-.sys-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 9px;border-radius:8px;
-  font-size:11.5px;font-weight:600;
-  border:1px solid transparent;
-  white-space:nowrap;
-}
-.sys-chip.alta{background:var(--success-bg);color:var(--success);border-color:var(--success-bd)}
-.sys-chip.baja{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
-.sys-chip svg{width:13px;height:13px}
-
-/* Chips con enlace (Alta) */
-a.sys-chip{text-decoration:none;cursor:pointer;transition:transform .12s, filter .12s}
-a.sys-chip:hover{filter:brightness(.96);transform:translateY(-1px)}
-a.sys-chip:active{transform:translateY(0)}
-a.sys-chip::after{
-  content:"";width:9px;height:9px;margin-left:2px;opacity:.7;
-  background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
-          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
-}
-
-/* Devices compactos */
-.devices-row{display:flex;flex-wrap:wrap;gap:8px 14px}
-.dev-item{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:500;color:var(--text-2);
-}
-.dev-item svg{width:15px;height:15px;color:var(--primary)}
-
-/* ---------- MODE VISIBILITY ---------- */
-body.mode-alta .baja-sec{display:none}
-body.mode-baja .alta-sec{display:none}
-
-/* ---------- EMPTY ---------- */
-.empty{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;padding:60px 20px;color:var(--text-3);text-align:center;
-  grid-column:1/-1;
-}
-.empty p{font-size:14px;font-weight:500}
-
-/* ---------- FOOTER ---------- */
-.footer-note{
-  text-align:center;color:var(--text-3);font-size:12px;
-  margin-top:32px;padding-top:16px;
-  border-top:1px solid var(--border);
-}
-
-/* ---------- MODAL REPORTE PDF ---------- */
-.modal{
-  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  padding:16px;
-}
-.modal[hidden]{display:none}
-.sheet{
-  background:var(--surface);border-radius:22px;box-shadow:var(--shadow-lg);
-  width:100%;max-width:640px;max-height:92dvh;display:flex;flex-direction:column;
-  border:1px solid var(--border);overflow:hidden;
-}
-.sheet-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;border-bottom:1px solid var(--border);
-}
-.sheet-head h2{font-size:17px;letter-spacing:-.01em}
-.sheet-head p{font-size:12px;color:var(--text-3)}
-.sheet-body{padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.sheet-foot{
-  display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;
-  padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);
-}
-.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:180px}
-.fld label,.lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3)}
-.fld input,.fld select{
+.fld textarea{
   background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
-  padding:10px 12px;font-size:14px;color:var(--text);outline:none;width:100%;
+  padding:10px 12px;font-size:13.5px;line-height:1.5;color:var(--text);outline:none;width:100%;resize:vertical;
 }
-.fld input:focus,.fld select:focus{border-color:var(--primary)}
+.fld textarea:focus{border-color:var(--primary)}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .seg{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;width:fit-content;max-width:100%;flex-wrap:wrap}
 .seg button{padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;color:var(--text-2)}
@@ -1253,6 +330,7 @@ body.mode-baja .alta-sec{display:none}
   <div class="top-actions">
     <button class="icon-btn" id="print-btn" title="Imprimir"><span id="print-icon"></span></button>
     <button class="icon-btn" id="pdf-btn" title="Reporte PDF"><span id="pdf-icon"></span></button>
+    <button class="icon-btn" id="mail-btn" title="Correo al equipo"><span id="mail-icon"></span></button>
     <button class="icon-btn" id="theme-btn" title="Cambiar tema"><span id="theme-icon"></span></button>
   </div>
 </header>
@@ -1336,6 +414,31 @@ body.mode-baja .alta-sec{display:none}
       <button class="btn dng" id="hist-clear">Limpiar historial</button>
       <button class="btn" id="hist-pdf">PDF del historial</button>
       <button class="btn pri" id="gen-pdf">Generar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== MODAL: CORREO AL EQUIPO ======== -->
+<div class="modal" id="mail-modal" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <div>
+        <h2>Correo al equipo</h2>
+        <p id="mail-src"></p>
+      </div>
+      <button class="icon-btn" id="mail-close" title="Cerrar"><span id="mail-close-icon"></span></button>
+    </div>
+    <div class="sheet-body">
+      <div class="fld"><label for="m-to">Para</label><input id="m-to" placeholder="correo1@dominio.com, correo2@dominio.com"></div>
+      <div class="fld"><label for="m-cc">CC</label><input id="m-cc" placeholder="Opcional"></div>
+      <div class="fld"><label for="m-subj">Asunto</label><input id="m-subj"></div>
+      <div class="fld"><label for="m-body">Mensaje</label><textarea id="m-body" rows="15"></textarea></div>
+      <p class="hint">El texto se redacta con base en el último PDF generado y puedes editarlo. Recuerda adjuntar manualmente el PDF descargado.</p>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn" id="m-regen">Usar selección actual</button>
+      <button class="btn" id="m-copy">Copiar</button>
+      <button class="btn pri" id="m-open">Abrir en correo</button>
     </div>
   </div>
 </div>
@@ -1765,6 +868,11 @@ function generatePDF(){
     apps: items.filter((_,i)=>checks[i]).map(i => i.app)
   });
   saveLog(log);
+  saveLast({
+    tipo, emp, nombre, area:o.name, destino: tipo==='cambio' ? dst.name : '', puesto,
+    fecha: $('f-fecha').value, resp,
+    items: items.map((it,i) => ({ ...it, done:!!checks[i] }))
+  });
 }
 
 /* PDF del historial de movimientos, filtrado por movimiento / área / nombre */
@@ -1801,6 +909,128 @@ function historyPDF(){
   doc.save(`Historial_${TIPO_TXT[REP.tipo]}_${new Date().toISOString().slice(0,10)}.pdf`);
 }
 
+/* ===== CORREO AL EQUIPO ===== */
+const LAST_KEY = 'it-guide-last';
+let memLast = null;
+function saveLast(r){ memLast = r; try { localStorage.setItem(LAST_KEY, JSON.stringify(r)); } catch(e){} }
+function loadLast(){ try { return JSON.parse(localStorage.getItem(LAST_KEY) || 'null') || memLast; } catch(e){ return memLast; } }
+
+function formSnapshot(){
+  const o = getDept($('f-area').value), dst = getDept($('f-dest').value), items = curItems();
+  if (!o || !items.length) return null;
+  const checks = [...document.querySelectorAll('#ckl input')].map(c => c.checked);
+  const emp = REP.scope === 'emp';
+  return {
+    tipo:REP.tipo, emp, nombre: emp ? $('f-nombre').value.trim() : '', area:o.name,
+    destino: REP.tipo==='cambio' ? dst.name : '', puesto: emp ? $('f-puesto').value : '',
+    fecha: $('f-fecha').value, resp: $('f-resp').value.trim(),
+    items: items.map((it,i) => ({ ...it, done:!!checks[i] }))
+  };
+}
+
+const MAIL_GROUPS = [
+  ['ALTA','Accesos dados de alta'], ['BAJA','Accesos dados de baja'],
+  ['ASIGNAR','Dispositivos asignados'], ['RECUPERAR','Dispositivos recuperados'],
+  ['REVISAR','Dispositivos por revisar / reasignar']
+];
+const MAIL_ART = { alta:'el ALTA', baja:'la BAJA', cambio:'el CAMBIO' };
+
+function buildMail(r){
+  const T = TIPO_TXT[r.tipo];
+  const fecha = fmtDate(r.fecha) || new Date().toLocaleDateString('es-MX');
+  const nom = r.nombre || '(nombre pendiente)';
+  const nm = r.emp ? `de ${nom}${r.puesto ? ` (${r.puesto})` : ''}` : `del área ${r.area}`;
+  const ar = r.tipo==='cambio'
+    ? (r.emp ? ` del área ${r.area}` : '') + ` al área ${r.destino}`
+    : (r.emp ? `, área ${r.area}` : '');
+  const base = r.tipo==='cambio'
+    ? (r.emp ? `${nom} · ${r.area} → ${r.destino}` : `Área ${r.area} → ${r.destino}`)
+    : (r.emp ? `${nom} · ${r.area}` : `Área ${r.area}`);
+  const subject = `[${T}] ${base} · ${fecha}`;
+
+  const total = r.items.length, hechos = r.items.filter(i => i.done).length, pend = total - hechos;
+  const L = [];
+  L.push('Hola equipo,', '');
+  L.push(`Les informo que se realizó ${MAIL_ART[r.tipo]} ${nm}${ar}.`, '');
+  L.push('Datos del movimiento:');
+  L.push(`• Movimiento: ${T}`);
+  if (r.emp){ L.push(`• Empleado: ${nom}`); if (r.puesto) L.push(`• Puesto: ${r.puesto}`); }
+  L.push(r.tipo==='cambio' ? `• Área origen: ${r.area}` : `• Área: ${r.area}`);
+  if (r.tipo==='cambio') L.push(`• Área destino: ${r.destino}`);
+  L.push(`• Fecha: ${fecha}`);
+  if (r.resp) L.push(`• Responsable de TI: ${r.resp}`);
+  L.push('', 'Detalle por sistema / dispositivo:', '');
+  MAIL_GROUPS.forEach(([k,t]) => {
+    const g = r.items.filter(i => i.acc === k);
+    if (!g.length) return;
+    L.push(t + ':');
+    g.forEach(i => L.push(`  ${i.done ? '✔' : '☐'} ${i.app}${i.done ? '' : ' (pendiente)'}`));
+    L.push('');
+  });
+  L.push(`Avance: ${hechos} de ${total} elementos realizados.`);
+  if (pend) L.push(`Quedan ${pend} pendiente(s); les avisaré al concluirlos.`);
+  L.push('', 'Se adjunta el reporte PDF con el detalle completo.', '', 'Quedo atento a cualquier comentario.', '', 'Saludos,');
+  if (r.resp) L.push(r.resp);
+  L.push('Departamento de TI');
+  return { subject, body: L.join('\n') };
+}
+
+function mailRecipients(r){
+  const set = new Set();
+  r.items.filter(i => i.acc === 'ALTA').forEach(i => (i.det.match(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g) || []).forEach(e => set.add(e)));
+  return [...set].join(', ');
+}
+
+function fillMail(r, srcText){
+  const m = buildMail(r);
+  $('m-subj').value = m.subject;
+  $('m-body').value = m.body;
+  $('m-to').value = mailRecipients(r);
+  $('mail-src').textContent = srcText;
+}
+function openMail(){
+  const r = loadLast();
+  if (r) fillMail(r, 'Basado en el último PDF generado (' + TIPO_TXT[r.tipo] + ')');
+  else {
+    const f = formSnapshot();
+    if (!f){ alert('Primero genera un reporte PDF o selecciona un movimiento.'); return; }
+    fillMail(f, 'Basado en la selección actual (aún no hay PDF generado)');
+  }
+  $('mail-modal').hidden = false;
+}
+function copyMail(){
+  const txt = 'Asunto: ' + $('m-subj').value + '\n\n' + $('m-body').value;
+  const done = () => { const b = $('m-copy'); b.textContent = 'Copiado ✔'; setTimeout(() => b.textContent = 'Copiar', 1600); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(() => alert('No se pudo copiar. Selecciona el texto manualmente.'));
+  } else {
+    $('m-body').select(); try { document.execCommand('copy'); done(); } catch(e){}
+  }
+}
+function openMailto(){
+  const nl = s => s.replace(/\r?\n/g, '\r\n');
+  const q = [];
+  if ($('m-cc').value.trim()) q.push('cc=' + encodeURIComponent($('m-cc').value.trim()));
+  q.push('subject=' + encodeURIComponent($('m-subj').value));
+  q.push('body=' + encodeURIComponent(nl($('m-body').value)));
+  window.location.href = 'mailto:' + encodeURIComponent($('m-to').value.trim()).replace(/%2C|%20/g, m => m === '%2C' ? ',' : '') + '?' + q.join('&');
+}
+function initMail(){
+  $('mail-icon').innerHTML = svg('mail', 20);
+  $('mail-close-icon').innerHTML = svg('x', 20);
+  $('mail-btn').addEventListener('click', openMail);
+  $('mail-close').addEventListener('click', () => $('mail-modal').hidden = true);
+  $('mail-modal').addEventListener('click', e => { if (e.target.id === 'mail-modal') $('mail-modal').hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('mail-modal').hidden = true; });
+  $('m-regen').addEventListener('click', () => {
+    const f = formSnapshot();
+    if (!f){ alert('No hay acciones en la selección actual del reporte.'); return; }
+    fillMail(f, 'Basado en la selección actual del reporte');
+  });
+  $('m-copy').addEventListener('click', copyMail);
+  $('m-open').addEventListener('click', openMailto);
+}
+
 function initReport(){
   $('pdf-icon').innerHTML = svg('pdf', 20);
   $('rep-close-icon').innerHTML = svg('x', 20);
@@ -1808,6 +1038,7 @@ function initReport(){
   segBind('seg-tipo','tipo');
   segBind('seg-scope','scope');
   $('pdf-btn').addEventListener('click', openModal);
+  initMail();
   $('rep-close').addEventListener('click', () => $('rep-modal').hidden = true);
   $('rep-modal').addEventListener('click', e => { if (e.target.id === 'rep-modal') $('rep-modal').hidden = true; });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') $('rep-modal').hidden = true; });
@@ -1854,3 +1085,4 @@ init();
 </script>
 </body>
 </html>
+
