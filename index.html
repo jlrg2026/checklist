@@ -1,1088 +1,342 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
-<title>CHECKLIST ABC · Altas y Bajas</title>
-<style>
-/* ---------- TOKENS ---------- */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#f2f2f7; --bg-blur:rgba(242,242,247,.82);
-  --surface:#fff; --surface-2:#f6f6f9;
-  --text:#1c1c1e; --text-2:#6c6c70; --text-3:#8e8e93;
-  --border:rgba(60,60,67,.12);
-  --primary:#0a84ff; --primary-2:#5856d6;
-  --success:#34c759; --danger:#ff3b30; --warning:#ff9500;
-  --success-bg:rgba(52,199,89,.12);
-  --success-bd:rgba(52,199,89,.25);
-  --danger-bg:rgba(255,59,48,.12);
-  --danger-bd:rgba(255,59,48,.25);
-  --primary-bg:rgba(10,132,255,.10);
-  --primary-bd:rgba(10,132,255,.22);
-  --radius:18px; --radius-sm:12px;
-  --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.06);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.18);
-}
-[data-theme="dark"]{
-  --bg:#000; --bg-blur:rgba(0,0,0,.72);
-  --surface:#1c1c1e; --surface-2:#2c2c2e;
-  --text:#fff; --text-2:#c7c7cc; --text-3:#8e8e93;
-  --border:rgba(84,84,88,.4);
-  --success-bg:rgba(52,199,89,.18);
-  --success-bd:rgba(52,199,89,.35);
-  --danger-bg:rgba(255,59,48,.18);
-  --danger-bd:rgba(255,59,48,.35);
-  --primary-bg:rgba(10,132,255,.18);
-  --primary-bd:rgba(10,132,255,.35);
-  --shadow:0 1px 2px rgba(0,0,0,.5),0 6px 20px rgba(0,0,0,.4);
-  --shadow-lg:0 20px 60px rgba(0,0,0,.7);
-}
-html,body{height:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg);color:var(--text);
-  font-size:15px;line-height:1.4;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  transition:background .3s,color .3s;
-  min-height:100dvh;
-  padding-bottom:40px;
-}
-button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
-svg{display:block;flex-shrink:0}
-input,select,textarea{font-family:inherit}
-
-/* ---------- TOPBAR ---------- */
-.topbar{
-  position:sticky;top:0;z-index:50;
-  height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  background:var(--bg-blur);
-  backdrop-filter:saturate(180%) blur(20px);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.brand{display:flex;align-items:center;gap:10px}
-.brand-logo{
-  width:34px;height:34px;border-radius:10px;
-  background:linear-gradient(135deg,#0a84ff,#5856d6);
-  display:grid;place-items:center;color:#fff;
-  box-shadow:0 4px 12px rgba(10,132,255,.35);
-}
-.brand-name{font-weight:700;font-size:15px;letter-spacing:-.01em}
-.brand-sub{font-size:11px;color:var(--text-3);margin-top:-1px}
-.top-actions{display:flex;gap:4px}
-.icon-btn{
-  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
-  color:var(--text);transition:background .15s;
-}
-.icon-btn:active{background:var(--surface-2)}
-
-/* ---------- MAIN ---------- */
-.main{max-width:1280px;margin:0 auto;padding:20px}
-
-/* ---------- HERO ---------- */
-.hero{
-  background:linear-gradient(135deg,#0a84ff 0%,#5856d6 100%);
-  border-radius:22px;padding:24px;color:#fff;
-  margin-bottom:18px;
-  box-shadow:0 12px 30px rgba(10,132,255,.28);
-  position:relative;overflow:hidden;
-}
-.hero::after{
-  content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
-  background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%);
-  border-radius:50%;
-}
-.hero-title{font-size:26px;font-weight:700;letter-spacing:-.03em;position:relative}
-.hero-sub{font-size:14px;opacity:.9;margin-top:4px;position:relative}
-.hero-stats{display:flex;gap:28px;margin-top:18px;position:relative;flex-wrap:wrap}
-.hstat{display:flex;flex-direction:column;gap:2px}
-.hstat-val{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1}
-.hstat-label{font-size:12px;opacity:.85;font-weight:500}
-
-/* ---------- MODE TOGGLE ---------- */
-.mode-toggle{
-  display:flex;gap:4px;margin-bottom:16px;
-  background:var(--surface);padding:5px;border-radius:14px;
-  box-shadow:var(--shadow);width:fit-content;
-}
-.mode-btn{
-  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;
-  color:var(--text-2);transition:all .2s;
-  display:flex;align-items:center;gap:6px;
-}
-.mode-btn.active{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(10,132,255,.3)}
-.mode-btn.active-alta{background:var(--success);color:#fff;box-shadow:0 4px 12px rgba(52,199,89,.3)}
-.mode-btn.active-baja{background:var(--danger);color:#fff;box-shadow:0 4px 12px rgba(255,59,48,.3)}
-.mode-btn.active-cambio{background:var(--warning);color:#fff;box-shadow:0 4px 12px rgba(255,149,0,.3)}
-
-/* ---------- LEGEND ---------- */
-.legend{
-  display:flex;gap:18px;flex-wrap:wrap;
-  margin-bottom:16px;font-size:12px;color:var(--text-2);font-weight:500;
-}
-.legend-item{display:flex;align-items:center;gap:6px}
-.legend-dot{width:10px;height:10px;border-radius:3px}
-
-/* ---------- TOOLBAR ---------- */
-.toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.search{
-  display:flex;align-items:center;gap:8px;
-  background:var(--surface);border-radius:12px;
-  padding:11px 14px;box-shadow:var(--shadow);color:var(--text-3);
-  flex:1;min-width:220px;
-}
-.search input{
-  border:none;background:transparent;outline:none;flex:1;
-  font-size:15px;color:var(--text);
-}
-
-/* ---------- GRID ---------- */
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
-
-/* ---------- CARD ---------- */
-.card{
-  background:var(--surface);border-radius:var(--radius);
-  box-shadow:var(--shadow);overflow:hidden;
-  display:flex;flex-direction:column;
-  border:1px solid var(--border);
-  transition:transform .15s, box-shadow .15s;
-  animation:cardIn .4s cubic-bezier(.2,.8,.2,1) both;
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
-
-.card-head{
-  padding:16px 18px;display:flex;align-items:flex-start;gap:12px;
-  border-bottom:1px solid var(--border);
-}
-.dept-dot{
-  width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:6px;
-  box-shadow:0 0 0 4px rgba(0,0,0,.04);
-}
-.card-title-wrap{flex:1;min-width:0}
-.card-title{
-  font-size:16px;font-weight:700;letter-spacing:-.01em;
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-}
-.ventas-badge{
-  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
-  background:rgba(255,45,85,.15);color:#ff2d55;letter-spacing:.02em;
-}
-.positions{
-  font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.4;
-}
-
-/* ---------- SECTIONS ---------- */
-.section{padding:14px 18px;border-bottom:1px solid var(--border)}
-.section:last-child{border-bottom:none}
-.section.alta-sec{background:rgba(52,199,89,.03)}
-.section.baja-sec{background:rgba(255,59,48,.03)}
-.section.devices-sec{background:rgba(10,132,255,.03)}
-
-.section-title{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;margin-bottom:10px;
-}
-.section-title.alta{color:var(--success)}
-.section-title.baja{color:var(--danger)}
-.section-title.devices{color:var(--primary)}
-
-.chips{display:flex;flex-wrap:wrap;gap:5px}
-.sys-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 9px;border-radius:8px;
-  font-size:11.5px;font-weight:600;
-  border:1px solid transparent;
-  white-space:nowrap;
-}
-.sys-chip.alta{background:var(--success-bg);color:var(--success);border-color:var(--success-bd)}
-.sys-chip.baja{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd)}
-.sys-chip svg{width:13px;height:13px}
-
-/* Chips con enlace (Alta) */
-a.sys-chip{text-decoration:none;cursor:pointer;transition:transform .12s, filter .12s}
-a.sys-chip:hover{filter:brightness(.96);transform:translateY(-1px)}
-a.sys-chip:active{transform:translateY(0)}
-a.sys-chip::after{
-  content:"";width:9px;height:9px;margin-left:2px;opacity:.7;
-  background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
-          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/><polyline points='15 3 21 3 21 9'/><line x1='10' y1='14' x2='21' y2='3'/></svg>") center/contain no-repeat;
-}
-
-/* Devices compactos */
-.devices-row{display:flex;flex-wrap:wrap;gap:8px 14px}
-.dev-item{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:500;color:var(--text-2);
-}
-.dev-item svg{width:15px;height:15px;color:var(--primary)}
-
-/* ---------- MODE VISIBILITY ---------- */
-body.mode-alta .baja-sec{display:none}
-body.mode-baja .alta-sec{display:none}
-
-/* ---------- EMPTY ---------- */
-.empty{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;padding:60px 20px;color:var(--text-3);text-align:center;
-  grid-column:1/-1;
-}
-.empty p{font-size:14px;font-weight:500}
-
-/* ---------- FOOTER ---------- */
-.footer-note{
-  text-align:center;color:var(--text-3);font-size:12px;
-  margin-top:32px;padding-top:16px;
-  border-top:1px solid var(--border);
-}
-
-/* ---------- MODAL REPORTE PDF ---------- */
-.modal{
-  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  padding:16px;
-}
-.modal[hidden]{display:none}
-.sheet{
-  background:var(--surface);border-radius:22px;box-shadow:var(--shadow-lg);
-  width:100%;max-width:640px;max-height:92dvh;display:flex;flex-direction:column;
-  border:1px solid var(--border);overflow:hidden;
-}
-.sheet-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 20px;border-bottom:1px solid var(--border);
-}
-.sheet-head h2{font-size:17px;letter-spacing:-.01em}
-.sheet-head p{font-size:12px;color:var(--text-3)}
-.sheet-body{padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.sheet-foot{
-  display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;
-  padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2);
-}
-.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:180px}
-.fld label,.lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3)}
-.fld input,.fld select{
-  background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
-  padding:10px 12px;font-size:14px;color:var(--text);outline:none;width:100%;
-}
-.fld input:focus,.fld select:focus{border-color:var(--primary)}
-.fld textarea{
-  background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
-  padding:10px 12px;font-size:13.5px;line-height:1.5;color:var(--text);outline:none;width:100%;resize:vertical;
-}
-.fld textarea:focus{border-color:var(--primary)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.seg{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;width:fit-content;max-width:100%;flex-wrap:wrap}
-.seg button{padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;color:var(--text-2)}
-.seg button.on{background:var(--primary);color:#fff}
-.seg button.on.alta{background:var(--success)}
-.seg button.on.baja{background:var(--danger)}
-.seg button.on.cambio{background:var(--warning)}
-.ckl{display:flex;flex-direction:column;gap:6px}
-.ck{
-  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;
-  background:var(--surface-2);border:1px solid var(--border);font-size:13px;cursor:pointer;
-}
-.ck input{width:17px;height:17px;accent-color:var(--success)}
-.ck b{font-size:10px;letter-spacing:.05em;padding:2px 7px;border-radius:6px;color:#fff}
-.ck b.ALTA,.ck b.ASIGNAR{background:var(--success)}
-.ck b.BAJA,.ck b.RECUPERAR{background:var(--danger)}
-.ck b.REVISAR{background:var(--warning)}
-.hint{font-size:12px;color:var(--text-3)}
-.btn{padding:10px 16px;border-radius:11px;font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--border)}
-.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn.dng{color:var(--danger)}
-
-/* ---------- PRINT ---------- */
-@media print{
-  .topbar,.hero,.toolbar,.mode-toggle,.legend,.modal{display:none!important}
-  body{background:#fff;color:#000;padding:0}
-  .main{padding:0;max-width:none}
-  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .card{
-    break-inside:avoid;box-shadow:none;border:1px solid #ccc;
-    animation:none;
-  }
-  .card:hover{transform:none;box-shadow:none}
-  .section.alta-sec,.section.baja-sec{display:block!important;background:#fff!important}
-  .section.devices-sec{background:#fff!important}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-</style>
-</head>
-<body>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-logo" id="brand-logo"></div>
-    <div>
-      <div class="brand-name">CHECKLIST</div>
-      <div class="brand-sub">Altas y Bajas</div>
-    </div>
-  </div>
-  <div class="top-actions">
-    <button class="icon-btn" id="print-btn" title="Imprimir"><span id="print-icon"></span></button>
-    <button class="icon-btn" id="pdf-btn" title="Reporte PDF"><span id="pdf-icon"></span></button>
-    <button class="icon-btn" id="mail-btn" title="Correo al equipo"><span id="mail-icon"></span></button>
-    <button class="icon-btn" id="theme-btn" title="Cambiar tema"><span id="theme-icon"></span></button>
-  </div>
-</header>
-
-<main class="main">
-  <div class="hero">
-    <div class="hero-title">CHECKLIST visual de Altas y Bajas</div>
-    <div class="hero-sub">Sistemas y dispositivos a gestionar por departamento</div>
-    <div class="hero-stats" id="hero-stats"></div>
-  </div>
-
-  <div class="mode-toggle" id="mode-toggle">
-    <button class="mode-btn active" data-mode="all">Ver todo</button>
-    <button class="mode-btn" data-mode="alta">Solo Altas</button>
-    <button class="mode-btn" data-mode="baja">Solo Bajas</button>
-  </div>
-
-  <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:var(--success)"></span>Alta / habilitar</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>Baja / deshabilitar</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--primary)"></span>Dispositivos</div>
-  </div>
-
-  <div class="toolbar">
-    <div class="search">
-      <span id="search-icon"></span>
-      <input placeholder="Buscar departamento, puesto o sistema..." id="search-input">
-    </div>
-  </div>
-
-  <div class="grid" id="grid"></div>
-
-  <div class="footer-note">Referencia interna · Departamento de TI</div>
-</main>
-
-<!-- ======== MODAL: REPORTE PDF ======== -->
-<div class="modal" id="rep-modal" hidden>
-  <div class="sheet">
-    <div class="sheet-head">
-      <div>
-        <h2>Reporte PDF profesional</h2>
-        <p>Altas, bajas y cambios por área o por empleado</p>
-      </div>
-      <button class="icon-btn" id="rep-close" title="Cerrar"><span id="rep-close-icon"></span></button>
-    </div>
-    <div class="sheet-body">
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Movimiento</div>
-        <div class="seg" id="seg-tipo">
-          <button data-v="alta" class="on alta">Alta</button>
-          <button data-v="baja">Baja</button>
-          <button data-v="cambio">Cambio</button>
-        </div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Aplicar sobre</div>
-        <div class="seg" id="seg-scope">
-          <button data-v="area" class="on">Área</button>
-          <button data-v="emp">Empleado</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="fld"><label id="lbl-area" for="f-area">Área</label><select id="f-area"></select></div>
-        <div class="fld" id="wrap-dest" hidden><label for="f-dest">Área destino</label><select id="f-dest"></select></div>
-      </div>
-      <div class="row" id="wrap-emp" hidden>
-        <div class="fld"><label for="f-nombre">Nombre del empleado</label><input id="f-nombre" placeholder="Nombre completo"></div>
-        <div class="fld"><label for="f-puesto">Puesto</label><select id="f-puesto"></select></div>
-      </div>
-      <div class="row">
-        <div class="fld"><label for="f-fecha">Fecha</label><input type="date" id="f-fecha"></div>
-        <div class="fld"><label for="f-resp">Responsable de TI</label><input id="f-resp" placeholder="Nombre del responsable"></div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Marca lo ya realizado (aparecerá en el listado del PDF)</div>
-        <div class="ckl" id="ckl"></div>
-        <p class="hint" id="rep-hint" style="margin-top:6px"></p>
-      </div>
-    </div>
-    <div class="sheet-foot">
-      <button class="btn dng" id="hist-clear">Limpiar historial</button>
-      <button class="btn" id="hist-pdf">PDF del historial</button>
-      <button class="btn pri" id="gen-pdf">Generar PDF</button>
-    </div>
-  </div>
-</div>
-
-<!-- ======== MODAL: CORREO AL EQUIPO ======== -->
-<div class="modal" id="mail-modal" hidden>
-  <div class="sheet">
-    <div class="sheet-head">
-      <div>
-        <h2>Correo al equipo</h2>
-        <p id="mail-src"></p>
-      </div>
-      <button class="icon-btn" id="mail-close" title="Cerrar"><span id="mail-close-icon"></span></button>
-    </div>
-    <div class="sheet-body">
-      <div class="fld"><label for="m-to">Para</label><input id="m-to" placeholder="correo1@dominio.com, correo2@dominio.com"></div>
-      <div class="fld"><label for="m-cc">CC</label><input id="m-cc" placeholder="Opcional"></div>
-      <div class="fld"><label for="m-subj">Asunto</label><input id="m-subj"></div>
-      <div class="fld"><label for="m-body">Mensaje</label><textarea id="m-body" rows="15"></textarea></div>
-      <p class="hint">El texto se redacta con base en el último PDF generado y puedes editarlo. Recuerda adjuntar manualmente el PDF descargado.</p>
-    </div>
-    <div class="sheet-foot">
-      <button class="btn" id="m-regen">Usar selección actual</button>
-      <button class="btn" id="m-copy">Copiar</button>
-      <button class="btn pri" id="m-open">Abrir en correo</button>
-    </div>
-  </div>
-</div>
-
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commission y Decommission · Gestión de cambios</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{--bg:#eef3fb;--sf:#fff;--ink:#0a1a3c;--mu:#4e6490;--ln:#d3ddf0;--navy:#0b1f4d;--br:#2457e6;--alta:#138a43;--baja:#14307d;--cambio:#2457e6;--err:#d92d3a;--r:14px;color-scheme:light}
+[data-t=dark]{--bg:#050c1d;--sf:#0b1731;--ink:#e6eeff;--mu:#8ea6d6;--ln:#1b2f5c;--navy:#07122b;--br:#5b8cff;--alta:#34d27b;--baja:#a5b8ff;--cambio:#3d7bff;--err:#ff7b87;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 420px at 85% -8%,color-mix(in srgb,var(--br) 16%,transparent),transparent),radial-gradient(700px 380px at -5% 0,color-mix(in srgb,var(--alta) 12%,transparent),transparent),var(--bg);background-attachment:fixed;color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif}
+h1,h2,h3,.num{font-family:'Bricolage Grotesque',Figtree,sans-serif;margin:0;letter-spacing:-.01em}
+header{position:sticky;top:0;z-index:5;background:var(--navy);border-bottom:1px solid #ffffff22}
+.hd{max-width:1240px;margin:auto;padding:12px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.logo{display:flex;gap:10px;align-items:center;margin-right:auto}.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--alta),var(--br));box-shadow:0 0 0 1px color-mix(in srgb,var(--br) 40%,transparent),0 6px 18px color-mix(in srgb,var(--br) 35%,transparent);display:grid;place-items:center;color:#fff;font:800 18px 'Bricolage Grotesque'}
+.logo h1{font-size:19px}.logo small{color:var(--mu);display:block;font-size:12px;margin-top:-2px}
+nav{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:12px}
+nav button{border:0;background:none;color:var(--mu);padding:8px 16px;border-radius:9px;font:600 14px Figtree;cursor:pointer}nav .on{background:var(--sf);color:var(--ink);box-shadow:0 1px 3px #0002}
+button,select,input,textarea{font:inherit;color:inherit}
+.b{border:1px solid var(--ln);background:var(--sf);padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}.b:hover{border-color:var(--br)}
+.b.p{background:var(--br);color:#fff;border-color:var(--br)}[data-t=dark] .b.p{color:#060d1f}
+:focus-visible{outline:2px solid var(--br);outline-offset:2px}
+main{max-width:1240px;margin:auto;padding:22px 20px 60px}.v{display:none}.v.on{display:block}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:var(--r);padding:18px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+.k{background:var(--sf);border:1px solid var(--ln);border-radius:var(--r);padding:14px 16px;border-top:4px solid var(--c,var(--br))}
+.k .num{font-size:38px;font-weight:800;color:var(--c,var(--ink));line-height:1.1}.k span{color:var(--mu);font-size:13px}
+.g{display:grid;gap:14px;grid-template-columns:repeat(12,1fr)}.g>*{min-width:0}.s4{grid-column:span 4}.s8{grid-column:span 8}.s6{grid-column:span 6}
+@media(max-width:900px){.s4,.s8,.s6{grid-column:span 12}}
+.card h3{font-size:16px;margin-bottom:10px}canvas{max-height:260px}
+.ul{list-style:none;margin:0;padding:0}.ul li{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln)}.ul li:last-child{border:0}
+.tg{padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.Alta{background:var(--alta)}.Baja{background:var(--baja)}.Cambio{background:var(--cambio)}[data-t=dark] .tg{color:#060d1f}
+.alert{background:color-mix(in srgb,var(--err) 12%,var(--sf));border:1px solid var(--err);border-radius:var(--r);padding:10px 14px;margin-bottom:14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.bar input,.bar select,.f input,.f select,.f textarea{border:1px solid var(--ln);background:var(--sf);border-radius:10px;padding:8px 10px;min-width:0}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;color:var(--mu);font-weight:600;padding:8px;border-bottom:2px solid var(--ln);white-space:nowrap}td{padding:9px 8px;border-bottom:1px solid var(--ln);vertical-align:top}tr:hover td{background:color-mix(in srgb,var(--br) 5%,transparent)}
+.ic{border:0;background:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--mu)}.ic:hover{background:var(--bg);color:var(--ink)}
+dialog{border:1px solid var(--ln);border-radius:18px;background:var(--sf);color:var(--ink);padding:22px;width:min(720px,94vw);max-height:92vh}dialog::backdrop{background:#0008}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:12px}.f label{display:grid;gap:4px;font-size:13px;color:var(--mu);font-weight:600}.f .w{grid-column:1/-1}.f textarea{resize:vertical}
+@media(max-width:600px){.f{grid-template-columns:1fr}}
+.ft{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+#pv{border:1px solid var(--ln);border-radius:10px;padding:10px;background:#eef3fb;color:#1b2536;max-height:420px;overflow:auto;margin-top:10px;font-size:14px}
+.em{text-align:center;padding:40px;color:var(--mu)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:99}#toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+header .logo h1{color:#fff}header .logo small{color:#9fb4e6}
+header nav{background:#ffffff14}header nav button{color:#b9c9f2}header nav .on{background:#fff;color:#0b1f4d;box-shadow:none}
+header .b{background:#ffffff12;color:#fff;border-color:#ffffff33}header .b:hover{border-color:#fff}header .b.p{background:var(--alta);border-color:var(--alta)}
+.qs{border:1px solid var(--ln);border-radius:99px;padding:3px 8px;font-size:12px;font-weight:600;background:var(--sf);color:var(--mu);cursor:pointer}.st1{color:var(--br);border-color:var(--br)}.st2{color:var(--alta);border-color:var(--alta)}
+</style></head><body>
+<header><div class="hd">
+<div class="logo"><div class="mark">C</div><div><h1>Commission y Decommission</h1><small id="co">Gestión de altas, bajas y cambios</small></div></div>
+<nav id="nav"><button class="on" data-v="dash">Panel</button><button data-v="list">Movimientos</button></nav>
+<button class="b p" id="new">+ Nuevo movimiento</button>
+<button class="b" id="cfgb" title="Configuración">Ajustes</button>
+<button class="b" id="th" title="Día / noche" aria-label="Cambiar tema">Día/Noche</button>
+</div></header>
+<main>
+<section class="v on" id="dash"></section>
+<section class="v" id="list">
+<div class="bar"><input id="q" type="search" placeholder="Buscar activo, responsable, ticket..." style="flex:1;min-width:200px">
+<select id="ft"><option value="">Todos los tipos</option><option>Alta</option><option>Baja</option><option>Cambio</option></select>
+<select id="fc"><option value="">Apps y dispositivos</option><option>App core</option><option>Dispositivo</option></select>
+<select id="fe"><option value="">Todos los estados</option></select>
+<button class="b" id="csvx">Exportar CSV</button><button class="b" id="rep">Reporte PDF</button></div>
+<div class="bar" id="sel" hidden><b id="sn"></b><button class="b p" id="mail">Redactar correo</button><button class="b" id="spdf">Comunicado PDF</button><button class="b" id="sclr">Quitar selección</button></div>
+<div class="card tw" id="tb"></div></section>
+</main>
+
+<dialog id="dm"><form method="dialog" class="f" id="fm"><h2 class="w" id="dt">Nuevo movimiento</h2>
+<label>Tipo de movimiento<select name="tipo" required></select></label>
+<label>Categoría<select name="categoria"></select></label>
+<label class="w">Activo (según la categoría)<select name="activo" required></select></label>
+<label class="w">Descripción / alcance<textarea name="descripcion" rows="2"></textarea></label>
+<label>Departamento<select name="depto" required></select></label>
+<label>Responsable técnico<input name="responsable"></label>
+<label>Solicitante (departamento)<select name="solicitante" required></select></label>
+<label>Estado de la República<select name="estadoRep" required></select></label>
+<label>Fecha efectiva<input type="date" name="fecha" required></label>
+<label>Estado<select name="estado"></select></label>
+<label>Impacto<select name="impacto"></select></label>
+<label>Ticket / referencia<input name="ticket"></label>
+<label class="w">Notas (ventana de mantenimiento, respaldo, accesos...)<textarea name="notas" rows="2"></textarea></label>
+<div class="ft w"><button type="button" class="b" data-x>Cancelar</button><button class="b p" value="ok">Guardar</button></div></form></dialog>
+
+<dialog id="de"><h2>Comunicado por correo</h2>
+<div class="f" style="margin-top:12px"><label class="w">Para (separa con coma)<input id="eto" placeholder="todos@empresa.com"></label>
+<label class="w">Asunto<input id="esu"></label>
+<label class="w">Mensaje adicional (opcional)<textarea id="eno" rows="2" placeholder="Ej. Se recomienda guardar su trabajo antes de la ventana."></textarea></label></div>
+<div id="pv"></div>
+<div class="ft"><button class="b" data-x>Cerrar</button><button class="b" id="etx">Copiar texto</button><button class="b" id="epd">PDF adjunto</button><button class="b" id="ems">Abrir en correo</button><button class="b p" id="ecp">Banner: copiar diseño</button></div></dialog>
+
+<dialog id="dr"><h2>Reporte PDF profesional</h2>
+<div class="f" style="margin-top:12px"><label>Tipo<select id="rt"><option value="">Todos</option><option>Alta</option><option>Baja</option><option>Cambio</option></select></label>
+<label>Categoría<select id="rc"><option value="">Todas</option><option>App core</option><option>Dispositivo</option></select></label>
+<label>Estado<select id="re"><option value="">Todos</option></select></label><label>Departamento<select id="rd"><option value="">Todos</option></select></label>
+<label class="w">Estado de la República<select id="rx"><option value="">Todos</option></select></label>
+<label>Desde<input type="date" id="r1"></label><label>Hasta<input type="date" id="r2"></label></div>
+<p id="rn" style="color:var(--mu)"></p>
+<div class="ft"><button class="b" data-x>Cerrar</button><button class="b p" id="rgo">Generar PDF</button></div></dialog>
+
+<dialog id="dc"><h2>Ajustes</h2>
+<div class="f" style="margin-top:12px"><label class="w">Nombre de la empresa (PDF y correo)<input id="cco"></label>
+<label>Área que comunica<input id="car" placeholder="Tecnologías de la Información"></label><label>Correo de contacto<input id="cem" placeholder="soporte@empresa.com"></label>
+<label class="w">URL del Web App de Google Apps Script (opcional, guarda en tu Google Sheet)<input id="cur" placeholder="https://script.google.com/macros/s/.../exec"></label></div>
+<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">Código de Apps Script para el Sheet (Codigo.gs)</summary><ol style="color:var(--mu);font-size:13px;padding-left:20px"><li>En tu Google Sheet: Extensiones &gt; Apps Script.</li><li>Pega el código, guarda y ejecuta <b>setup</b> una vez (autoriza permisos).</li><li>Implementar &gt; Nueva implementación &gt; Aplicación web: ejecutar como "Yo", acceso "Cualquier usuario".</li><li>Copia la URL que termina en /exec y pégala arriba.</li></ol>
+<textarea id="gs" readonly rows="10" style="width:100%;font:12px monospace;margin-top:8px"></textarea><button class="b" id="gcp" style="margin-top:6px">Copiar código</button></details>
+<div class="ft"><button class="b" data-x>Cancelar</button><button class="b p" id="csv">Guardar ajustes</button></div></dialog>
+<div id="toast"></div>
+
 <script>
-/* =========================================================
-   ICONS
-   ========================================================= */
-const ICONS = {
-  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
-  cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
-  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
-  globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
-  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
-  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
-  pdf:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 12v6"/><polyline points="9 15 12 18 15 15"/>',
-  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  laptop:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
-  monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
-  phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
-  tablet:'<rect x="4" y="2" width="16" height="20" rx="2.5"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
-  keyboard:'<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="10" x2="6" y2="10"/><line x1="10" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="14" y2="10"/><line x1="18" y1="10" x2="18" y2="10"/><line x1="7" y1="14" x2="17" y2="14"/>',
-  check:'<polyline points="20 6 9 17 4 12"/>',
-  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
-  sun:'<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
-  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'
-};
-function svg(name, size=14){
-  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+const $=s=>document.querySelector(s),K='cdm1',F=['id','tipo','categoria','activo','descripcion','depto','responsable','solicitante','estadoRep','fecha','estado','impacto','ticket','notas'];
+const TL={Alta:'Alta (Commission)',Baja:'Baja (Decommission)',Cambio:'Cambio'},EST=['Planeado','En curso','Completado','Cancelado'],IMP=['Bajo','Medio','Alto','Crítico'],CAT=['App core','Dispositivo'];
+const srt=a=>[...a].sort((x,y)=>x.localeCompare(y,'es',{sensitivity:'base'}));
+const DEP=srt(['Administración','Digital','Dirección General','Dirección Médica','Dirección Mercadotecnia','Finanzas','IT','Logística','Mercadotecnia','Recursos Humanos','Ventas']);
+const MX=srt(['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Ciudad de México','Coahuila','Colima','Durango','Estado de México','Guanajuato','Guerrero','Hidalgo','Jalisco','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas']);
+const ACT={'App core':srt(['Correo Dermavan','Biométrico','Usuario DermavanLab','Usuario SAP','Usuario Cotizador SAP','Correo Gmail control médico','Usuario CRM Harmony']),'Dispositivo':srt(['Laptop','Monitor','Teléfono móvil','iPhone','iPad','Periférico','Otro'])};
+const late=r=>(r.estado=='Planeado'||r.estado=='En curso')&&r.fecha&&r.fecha<today();
+const ph=(a,sel)=>'<option value="">Selecciona...</option>'+opts(a,sel);
+let D=JSON.parse(localStorage.getItem(K)||'[]'),C=Object.assign({co:'DERMAVAN',ar:'Tecnologías de la Información',em:'',url:''},JSON.parse(localStorage.getItem(K+'c')||'{}')),SEL=new Set(),CH={},edit=null,MAILROWS=[];
+const e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),today=()=>new Date().toISOString().slice(0,10);
+const fd=s=>{if(!s)return'-';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`},toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600)};
+const opts=(a,sel)=>a.map(x=>`<option${x==sel?' selected':''}>${x}</option>`).join('');
+const ls=()=>localStorage.setItem(K,JSON.stringify(D)),norm=x=>({...x,fecha:String(x.fecha||'').slice(0,10)});
+function sync(a,row){ls();if(C.url)fetch(C.url,{method:'POST',mode:'no-cors',body:JSON.stringify({action:a,fields:F,row})}).catch(()=>toast('Guardado local; falló el envío al Sheet'))}
+async function load(){if(C.url){try{const r=await(await fetch(C.url)).json();D=r.filter(x=>x.id).map(norm);ls()}catch(_){toast('No se pudo leer el Sheet; uso la copia local')}}render()}
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* ---------- Tema y navegación ---------- */
+function theme(t){document.documentElement.dataset.t=t;localStorage.setItem(K+'t',t);render()}
+$('#th').onclick=()=>theme(document.documentElement.dataset.t=='dark'?'light':'dark');
+$('#nav').onclick=ev=>{const v=ev.target.dataset.v;if(!v)return;go(v)};
+function go(v){document.querySelectorAll('.v').forEach(x=>x.classList.toggle('on',x.id==v));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==v));render()}
+document.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+['#fe','#re'].forEach(s=>$(s).insertAdjacentHTML('beforeend',opts(EST)));$('#rd').insertAdjacentHTML('beforeend',opts(DEP));$('#rx').insertAdjacentHTML('beforeend',opts(MX));
+
+/* ---------- Dashboard ---------- */
+function dash(){
+ const t=today(),n=x=>D.filter(x).length,open=r=>r.estado=='Planeado'||r.estado=='En curso',in14=new Date(Date.now()+14*864e5).toISOString().slice(0,10);
+ const late=D.filter(r=>open(r)&&r.fecha&&r.fecha<t),up=D.filter(r=>open(r)&&r.fecha>=t&&r.fecha<=in14).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+ const k=(l,v,c)=>`<div class="k" style="--c:${c||''}"><div class="num">${v}</div><span>${l}</span></div>`;
+ $('#dash').innerHTML=(D.length?'':`<div class="card em"><h2>Aún no hay movimientos</h2><p>Registra tu primer commission, decommission o cambio, o carga ejemplos para ver el panel.</p><button class="b p" id="seed">Cargar ejemplos</button></div>`)+
+ (late.length?`<div class="alert"><b>${late.length} movimiento(s) vencido(s)</b> sin completar: ${late.slice(0,3).map(r=>e(r.activo)).join(', ')}${late.length>3?'...':''}</div>`:'')+
+ `<div class="kp">${k('Total de movimientos',D.length)}${k('Altas (Commission)',n(r=>r.tipo=='Alta'),'var(--alta)')}${k('Bajas (Decommission)',n(r=>r.tipo=='Baja'),'var(--baja)')}${k('Cambios',n(r=>r.tipo=='Cambio'),'var(--cambio)')}${k('Pendientes',n(open),'var(--br)')}${k('Completados',n(r=>r.estado=='Completado'),'var(--alta)')}${k('Próximos 14 días',up.length)}</div>
+ <div class="g"><div class="card s4"><h3>Por tipo</h3><canvas id="c1"></canvas></div><div class="card s8"><h3>Movimientos por mes</h3><canvas id="c2"></canvas></div>
+ <div class="card s6"><h3>Por departamento</h3><canvas id="c3"></canvas></div>
+ <div class="card s6"><h3>Próximos 14 días</h3>${up.length?`<ul class="ul">${up.map(r=>`<li><span class="tg ${r.tipo}">${r.tipo}</span><div style="flex:1"><b>${e(r.activo)}</b><br><small style="color:var(--mu)">${e(r.depto)} · ${e(r.categoria)}</small></div><b>${fd(r.fecha)}</b></li>`).join('')}</ul>`:'<p class="em">Sin movimientos programados.</p>'}</div></div>`;
+ if($('#seed'))$('#seed').onclick=seed;
+ const ink=css('--mu'),ln=css('--ln'),base={plugins:{legend:{labels:{color:ink}}},scales:{x:{ticks:{color:ink},grid:{color:ln}},y:{ticks:{color:ink,precision:0},grid:{color:ln},beginAtZero:true}}};
+ Object.values(CH).forEach(c=>c.destroy());const cl={Alta:css('--alta'),Baja:css('--baja'),Cambio:css('--cambio')};
+ CH.a=new Chart($('#c1'),{type:'doughnut',data:{labels:Object.keys(TL).map(x=>TL[x]),datasets:[{data:Object.keys(TL).map(x=>n(r=>r.tipo==x)),backgroundColor:Object.values(cl),borderColor:css('--sf')}]},options:{plugins:{legend:{position:'bottom',labels:{color:ink}}}}});
+ const ms=[...new Set(D.map(r=>r.fecha.slice(0,7)))].sort();
+ CH.b=new Chart($('#c2'),{type:'bar',data:{labels:ms,datasets:Object.keys(TL).map(x=>({label:TL[x],backgroundColor:cl[x],data:ms.map(m=>D.filter(r=>r.tipo==x&&r.fecha.startsWith(m)).length)}))},options:{...base,scales:{x:{...base.scales.x,stacked:true},y:{...base.scales.y,stacked:true}}}});
+ const ds=DEP.filter(d=>D.some(r=>r.depto==d));
+ CH.c=new Chart($('#c3'),{type:'bar',data:{labels:ds,datasets:[{label:'Movimientos',backgroundColor:css('--br'),data:ds.map(d=>D.filter(r=>r.depto==d).length)}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{...base.scales.y,beginAtZero:true},y:{ticks:{color:ink},grid:{display:false}}}}});
+}
+function seed(){const d=n=>new Date(Date.now()+n*864e5).toISOString().slice(0,10),m=(tipo,categoria,activo,depto,n,estado,impacto,descripcion,estadoRep)=>({id:'M'+Math.random().toString(36).slice(2,8),tipo,categoria,activo,descripcion,depto,responsable:'Equipo IT',solicitante:'Dirección General',estadoRep,fecha:d(n),estado,impacto,ticket:'',notas:''});
+ D=[m('Alta','App core','Usuario SAP','Finanzas',6,'Planeado','Alto','Alta de usuario con perfil de captura.','Jalisco'),m('Baja','App core','Usuario CRM Harmony','Ventas',10,'Planeado','Crítico','Baja de usuario por salida del colaborador.','Ciudad de México'),m('Cambio','App core','Correo Dermavan','Digital',-3,'En curso','Medio','Cambio de alias y grupos de distribución.','Nuevo León'),m('Alta','Dispositivo','Laptop','Mercadotecnia',3,'Planeado','Bajo','Entrega y configuración de equipo.','Jalisco'),m('Baja','Dispositivo','Monitor','Administración',-20,'Completado','Bajo','Retiro y disposición del activo.','Puebla')];ls();render();toast('Ejemplos cargados')}
+
+/* ---------- Lista ---------- */
+function filt(){const q=$('#q').value.toLowerCase(),t=$('#ft').value,c=$('#fc').value,s=$('#fe').value;
+ return D.filter(r=>(!t||r.tipo==t)&&(!c||r.categoria==c)&&(!s||r.estado==s)&&(!q||F.some(f=>String(r[f]).toLowerCase().includes(q)))).sort((a,b)=>b.fecha.localeCompare(a.fecha))}
+function list(){const R=filt();$('#sel').hidden=!SEL.size;$('#sn').textContent=SEL.size+' seleccionado(s)';
+ $('#tb').innerHTML=R.length?`<table><thead><tr><th><input type="checkbox" id="all" aria-label="Seleccionar todos"></th><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Activo</th><th>Descripción</th><th>Departamento</th><th>Estado de la Rep.</th><th>Responsable</th><th>Estado</th><th>Impacto</th><th></th></tr></thead><tbody>${R.map(r=>`<tr><td><input type="checkbox" class="ck" data-id="${r.id}" ${SEL.has(r.id)?'checked':''}></td><td${late(r)?' style="color:var(--err);font-weight:600" title="Vencido"':''}>${fd(r.fecha)}</td><td><span class="tg ${r.tipo}">${r.tipo}</span></td><td>${e(r.categoria)}</td><td><b>${e(r.activo)}</b>${r.ticket?`<br><small style="color:var(--mu)">${e(r.ticket)}</small>`:''}</td><td style="min-width:200px;max-width:320px;color:var(--mu)">${e(r.descripcion)||'-'}</td><td>${e(r.depto)}</td><td>${e(r.estadoRep)}</td><td>${e(r.responsable)}</td><td><select class="qs st${EST.indexOf(r.estado)}" data-id="${r.id}" aria-label="Cambiar estado">${opts(EST,r.estado)}</select></td><td>${e(r.impacto)}</td><td style="white-space:nowrap"><button class="ic" data-a="m" data-id="${r.id}" title="Correo">Correo</button><button class="ic" data-a="p" data-id="${r.id}" title="PDF">PDF</button><button class="ic" data-a="e" data-id="${r.id}">Editar</button><button class="ic" data-a="c" data-id="${r.id}" title="Duplicar">Duplicar</button><button class="ic" data-a="d" data-id="${r.id}">Borrar</button></td></tr>`).join('')}</tbody></table>`:'<p class="em">No hay movimientos con estos filtros.</p>';
+ const a=$('#all');if(a)a.onchange=()=>{R.forEach(r=>a.checked?SEL.add(r.id):SEL.delete(r.id));list()}}
+$('#tb').onclick=ev=>{const b=ev.target,id=b.dataset.id;if(b.classList.contains('ck')){b.checked?SEL.add(id):SEL.delete(id);list();return}
+ const r=D.find(x=>x.id==id);if(!r)return;({m:()=>mail([r]),p:()=>pdf([r],'com'),e:()=>form(r),c:()=>{const n={...r,id:'M'+Date.now().toString(36),estado:'Planeado'};D.push(n);sync('create',n);render();toast('Duplicado: ajusta fecha y datos')},d:()=>{if(confirm('¿Borrar "'+r.activo+'"?')){D=D.filter(x=>x.id!=id);SEL.delete(id);sync('delete',r);render()}}})[b.dataset.a]?.()};
+$('#tb').onchange=ev=>{const t=ev.target;if(!t.classList.contains('qs'))return;const r=D.find(x=>x.id==t.dataset.id);if(!r)return;r.estado=t.value;sync('update',r);render();toast('Estado actualizado')};
+$('#csvx').onclick=()=>{const R=filt(),q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',csv=[F.map(q).join(',')].concat(R.map(r=>F.map(k=>q(r[k])).join(','))).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='Movimientos_CDM_'+today()+'.csv';a.click();toast('CSV exportado ('+R.length+')')};
+['#q','#ft','#fc','#fe'].forEach(s=>$(s).oninput=list);
+$('#sclr').onclick=()=>{SEL.clear();list()};$('#mail').onclick=()=>mail(D.filter(r=>SEL.has(r.id)));$('#spdf').onclick=()=>pdf(D.filter(r=>SEL.has(r.id)),'com');
+
+/* ---------- Formulario ---------- */
+function form(r){edit=r;const f=$('#fm');$('#dt').textContent=r?'Editar movimiento':'Nuevo movimiento';
+ const set=(n,h)=>f[n].innerHTML=h;set('tipo',Object.keys(TL).map(k=>`<option value="${k}"${r&&r.tipo==k?' selected':''}>${TL[k]}</option>`).join(''));set('categoria',opts(CAT,r?.categoria));set('depto',ph(DEP,r?.depto));set('solicitante',ph(DEP,r?.solicitante));set('estadoRep',ph(MX,r?.estadoRep));set('estado',opts(EST,r?.estado));set('impacto',opts(IMP,r?.impacto||'Medio'));
+ fillAct(r?.activo);['descripcion','responsable','fecha','ticket','notas'].forEach(n=>f[n].value=r?r[n]:(n=='fecha'?today():''));$('#dm').showModal()}
+function fillAct(sel){const f=$('#fm');let a=ACT[f.categoria.value]||[];if(sel&&!a.includes(sel))a=srt([...a,sel]);f.activo.innerHTML=ph(a,sel)}
+$('#fm').categoria.onchange=()=>fillAct();
+$('#new').onclick=()=>form(null);
+$('#fm').onsubmit=ev=>{if(ev.submitter?.value!='ok')return;const f=$('#fm'),row=edit?{...edit}:{id:'M'+Date.now().toString(36)};F.slice(1).forEach(k=>row[k]=f[k].value.trim());
+ edit?D=D.map(x=>x.id==row.id?row:x):D.push(row);sync(edit?'update':'create',row);render();toast('Movimiento guardado')};
+
+/* ---------- Correo ---------- */
+const grp=rows=>['Alta','Baja','Cambio'].map(t=>[t,rows.filter(r=>r.tipo==t)]).filter(g=>g[1].length);
+const head={Alta:'Nuevas incorporaciones (Commission)',Baja:'Retiros (Decommission)',Cambio:'Cambios'};
+function subj(rows){const t=[...new Set(rows.map(r=>r.tipo))];const w=t.length==1?{Alta:'Commission',Baja:'Decommission',Cambio:'Cambio'}[t[0]]:'Commission/Decommission';return rows.length==1?`Comunicado de ${w}: ${rows[0].activo} (${fd(rows[0].fecha)})`:`Comunicado de ${w}: ${rows.length} movimientos de TI`}
+function mhtml(rows,note){
+ const co=e(C.co),ar=e(C.ar),ff='font-family:Segoe UI,Arial,sans-serif;',cc={Alta:'#138a43',Baja:'#14307d',Cambio:'#2457e6'},cb={Alta:'#e3f6ea',Baja:'#e4e9f5',Cambio:'#e4ecff'},ic={Bajo:'#138a43',Medio:'#2457e6',Alto:'#14307d','Crítico':'#d92d3a'};
+ const ts=[...new Set(rows.map(r=>r.tipo))],ttl=ts.length==1?{Alta:'Nueva alta (Commission)',Baja:'Baja programada (Decommission)',Cambio:'Cambio programado'}[ts[0]]:'Commission y Decommission',ds=rows.map(r=>r.fecha).filter(Boolean).sort(),
+ rng=ds.length?(ds[0]==ds[ds.length-1]?fd(ds[0]):fd(ds[0])+' al '+fd(ds[ds.length-1])):'',cnt=t=>rows.filter(r=>r.tipo==t).length;
+ const chip=t=>`<td align="center" width="33%" style="padding:12px 6px;background:${cb[t]};border-radius:10px"><div style="${ff}font-size:28px;font-weight:800;color:${cc[t]};line-height:1">${cnt(t)}</div><div style="${ff}font-size:12px;color:#4a5a70;margin-top:4px">${{Alta:'Altas',Baja:'Bajas',Cambio:'Cambios'}[t]}</div></td>`;
+ const meta=(l,v,c)=>`<td style="padding:0 20px 0 0;vertical-align:top;${ff}font-size:12px;color:#5b6b80">${l}<br><b style="font-size:13px;color:${c||'#0f1b2d'}">${v}</b></td>`;
+ const card=r=>`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px;border:1px solid #d9e0e8;border-left:6px solid ${cc[r.tipo]};border-radius:10px;background:#ffffff"><tr><td style="padding:14px 16px;${ff}"><span style="display:inline-block;background:${cc[r.tipo]};color:#ffffff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">${TL[r.tipo]}</span> <span style="display:inline-block;background:#eef2f6;color:#4a5a70;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px">${e(r.categoria)}</span>
+<div style="font-size:18px;font-weight:700;color:#0f1b2d;margin:9px 0 3px">${e(r.activo)}</div>${r.descripcion?`<div style="font-size:13px;color:#4a5a70;line-height:1.5">${e(r.descripcion)}</div>`:''}
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:12px"><tr>${meta('Fecha efectiva',fd(r.fecha))}${meta('Área',e(r.depto))}${meta('Estado de la República',e(r.estadoRep||'-'))}${meta('Impacto',e(r.impacto),ic[r.impacto])}</tr></table>
+${r.notas?`<div style="margin-top:12px;padding:9px 12px;background:#f3f6fa;border-radius:6px;font-size:12px;color:#4a5a70;line-height:1.5"><b>Nota:</b> ${e(r.notas)}</div>`:''}</td></tr></table>`;
+ return`<div style="background:#eef3fb;padding:20px"><table role="presentation" align="center" width="640" cellpadding="0" cellspacing="0" style="width:640px;max-width:100%;background:#ffffff;border-radius:14px;border:1px solid #d9e0e8">
+<tr><td bgcolor="#0b1f4d" style="background:#0b1f4d;background-image:linear-gradient(135deg,#0b1f4d,#1a3fb0 62%,#2457e6);padding:28px 30px;border-radius:14px 14px 0 0;${ff}"><div style="font-size:13px;color:#a9c0ee;font-weight:600">${co} | ${ar}</div><div style="font-size:28px;font-weight:800;color:#ffffff;margin:8px 0 6px;line-height:1.2">${ttl}</div><div style="font-size:14px;color:#d6e2fb">${rows.length} movimiento(s) de sistemas y equipos &ndash; ${rng}</div></td></tr>
+<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td width="34%" height="6" bgcolor="#138a43" style="font-size:0;line-height:6px">&nbsp;</td><td width="33%" bgcolor="#14307d" style="font-size:0;line-height:6px">&nbsp;</td><td width="33%" bgcolor="#2457e6" style="font-size:0;line-height:6px">&nbsp;</td></tr></table></td></tr>
+<tr><td style="padding:26px 30px 8px;${ff}color:#1b2536;font-size:15px;line-height:1.6"><b>Estimados colaboradores:</b><br>Les informamos los movimientos programados por ${ar}. Pedimos tomar las previsiones necesarias según la fecha y el impacto indicados.</td></tr>
+<tr><td style="padding:12px 30px"><table role="presentation" width="100%" cellpadding="0" cellspacing="8" style="margin:0 -8px;width:calc(100% + 16px)"><tr>${chip('Alta')}${chip('Baja')}${chip('Cambio')}</tr></table></td></tr>
+<tr><td style="padding:8px 30px 4px">${grp(rows).map(([t,g])=>`<div style="${ff}font-size:15px;font-weight:700;color:${cc[t]};margin:16px 0 10px">${head[t]}</div>`+[...g].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(card).join('')).join('')}</td></tr>
+${note?`<tr><td style="padding:4px 30px 8px;${ff}font-size:14px;color:#1b2536;line-height:1.6">${e(note).replace(/\n/g,'<br>')}</td></tr>`:''}
+<tr><td style="padding:14px 30px 26px;${ff}font-size:14px;color:#1b2536;line-height:1.6">${C.em?`<a href="mailto:${e(C.em)}" style="display:inline-block;background:#0b1f4d;color:#ffffff;padding:12px 24px;border-radius:8px;font-weight:700;text-decoration:none">Contactar a ${ar}</a><br><br>`:'Si tienes dudas, abre un ticket con '+ar+'.<br><br>'}Saludos cordiales,<br><b>${ar}</b><br>${co}</td></tr>
+<tr><td bgcolor="#f3f6fa" style="background:#f3f6fa;padding:14px 30px;border-radius:0 0 14px 14px;${ff}font-size:11px;color:#7a8aa0">Comunicado interno de ${co}. Información confidencial, no la reenvíes fuera de la empresa.</td></tr></table></div>`}
+function mtext(rows,note){return`Estimados colaboradores:\n\nLes informamos los siguientes movimientos programados por ${C.ar}:\n\n`+grp(rows).map(([t,g])=>head[t].toUpperCase()+'\n'+g.map(r=>`- ${r.activo} (${r.categoria}) | Fecha: ${fd(r.fecha)} | Área: ${r.depto} | Estado: ${r.estadoRep||'-'} | Impacto: ${r.impacto}${r.descripcion?'\n  '+r.descripcion:''}${r.notas?'\n  Nota: '+r.notas:''}`).join('\n')).join('\n\n')+(note?`\n\n${note}`:'')+`\n\nSi tienes dudas, escríbenos${C.em?' a '+C.em:''} o abre un ticket con ${C.ar}.\n\nSaludos cordiales,\n${C.ar}\n${C.co}`}
+function mail(rows){if(!rows.length)return;MAILROWS=rows;$('#esu').value=subj(rows);$('#eno').value='';pv();$('#de').showModal()}
+const pv=()=>$('#pv').innerHTML=mhtml(MAILROWS,$('#eno').value);$('#eno').oninput=pv;
+$('#ems').onclick=()=>{location.href=`mailto:${encodeURIComponent($('#eto').value)}?subject=${encodeURIComponent($('#esu').value)}&body=${encodeURIComponent(mtext(MAILROWS,$('#eno').value))}`};
+$('#etx').onclick=()=>navigator.clipboard.writeText(mtext(MAILROWS,$('#eno').value)).then(()=>toast('Texto copiado'));
+$('#ecp').onclick=async()=>{const h=mhtml(MAILROWS,$('#eno').value);try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'}),'text/plain':new Blob([mtext(MAILROWS,$('#eno').value)],{type:'text/plain'})})])}catch(_){const r=document.createRange();r.selectNodeContents($('#pv'));getSelection().removeAllRanges();getSelection().addRange(r);document.execCommand('copy')}toast('Banner copiado: pégalo con Ctrl+V en Outlook o Gmail')};
+$('#epd').onclick=()=>pdf(MAILROWS,'com',$('#eno').value);
+
+/* ---------- PDF ---------- */
+function pdf(rows,kind,note){if(!rows.length)return toast('No hay movimientos para el PDF');
+ const d=new jspdf.jsPDF({orientation:kind=='rep'?'l':'p',unit:'pt',format:'a4'}),W=d.internal.pageSize.getWidth(),m=40,navy=[11,31,77],col={Alta:[19,138,67],Baja:[20,48,125],Cambio:[36,87,230]};
+ d.setFillColor(...navy);d.rect(0,0,W,84,'F');d.setFillColor(...col.Alta);d.rect(0,84,W/3,5,'F');d.setFillColor(...col.Baja);d.rect(W/3,84,W/3,5,'F');d.setFillColor(...col.Cambio);d.rect(2*W/3,84,W/3,5,'F');
+ d.setTextColor(255);d.setFont('helvetica','bold');d.setFontSize(11);d.text((C.co+' | '+C.ar).toUpperCase(),m,30);d.setFontSize(20);d.text(kind=='rep'?'Reporte de Commission y Decommission':'Comunicado de cambios en sistemas y equipos',m,56);
+ d.setFont('helvetica','normal');d.setFontSize(10);d.text('Emitido: '+fd(today())+'   Folio: CDM-'+Date.now().toString(36).toUpperCase(),m,74);
+ let y=112;d.setTextColor(30,40,60);
+ const cnt=t=>rows.filter(r=>r.tipo==t).length,bw=(W-2*m-24)/3;
+ ['Alta','Baja','Cambio'].forEach((t,i)=>{const x=m+i*(bw+12);d.setDrawColor(...col[t]);d.setLineWidth(1.2);d.roundedRect(x,y,bw,52,6,6);d.setFont('helvetica','bold');d.setFontSize(24);d.setTextColor(...col[t]);d.text(String(cnt(t)),x+14,y+34);d.setFontSize(10);d.setTextColor(90,105,128);d.setFont('helvetica','normal');d.text(TL[t],x+52,y+31)});
+ y+=72;d.setTextColor(30,40,60);d.setFontSize(10.5);
+ if(kind=='com'){const t=d.splitTextToSize('Estimados colaboradores: por medio del presente se comunican los movimientos de altas, bajas y cambios de aplicaciones core y dispositivos programados por '+C.ar+'. Se solicita tomar las previsiones necesarias de acuerdo con la fecha e impacto indicados.'+(note?' '+note:''),W-2*m);d.text(t,m,y);y+=t.length*13+8}
+ const body=[...rows].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(r=>kind=='rep'?[fd(r.fecha),TL[r.tipo],r.categoria,r.activo+(r.descripcion?'\n'+r.descripcion:''),r.depto,r.estadoRep,r.responsable,r.estado,r.impacto,r.ticket]:[fd(r.fecha),TL[r.tipo],r.activo+' ('+r.categoria+')'+(r.descripcion?'\n'+r.descripcion:'')+(r.notas?'\nNota: '+r.notas:''),r.depto+(r.estadoRep?'\n'+r.estadoRep:''),r.responsable,r.impacto]);
+ d.autoTable({startY:y,margin:{left:m,right:m,bottom:60},head:[kind=='rep'?['Fecha','Tipo','Categoría','Activo / descripción','Departamento','Estado Rep.','Responsable','Estado','Impacto','Ticket']:['Fecha','Tipo','Activo / alcance','Departamento / Estado','Responsable','Impacto']],body,theme:'grid',styles:{fontSize:8.5,cellPadding:5,lineColor:[217,224,232],textColor:[30,40,60]},headStyles:{fillColor:navy,textColor:255},alternateRowStyles:{fillColor:[243,246,250]},
+  didParseCell:h=>{if(h.section=='body'&&h.column.index==1){const t=Object.keys(TL).find(k=>TL[k]==h.cell.raw);h.cell.styles.textColor=col[t];h.cell.styles.fontStyle='bold'}}});
+ if(kind=='com'){let fy=d.lastAutoTable.finalY+50;if(fy>d.internal.pageSize.getHeight()-120){d.addPage();fy=80}
+  ['Elaboró','Autorizó'].forEach((s,i)=>{const x=m+i*((W-2*m)/2);d.setDrawColor(120);d.setLineWidth(.6);d.line(x,fy,x+190,fy);d.setFontSize(9.5);d.setTextColor(90,105,128);d.text(s+' ('+C.ar+')',x,fy+14)})}
+ const n=d.getNumberOfPages(),H=d.internal.pageSize.getHeight();for(let i=1;i<=n;i++){d.setPage(i);d.setDrawColor(217,224,232);d.line(m,H-38,W-m,H-38);d.setFontSize(8.5);d.setTextColor(120,130,150);d.text(C.co+' · Documento confidencial de uso interno · '+C.ar,m,H-24);d.text('Página '+i+' de '+n,W-m,H-24,{align:'right'})}
+ d.save((kind=='rep'?'Reporte_CDM_':'Comunicado_CDM_')+today()+'.pdf');toast('PDF generado')}
+$('#rep').onclick=()=>{rrows();$('#dr').showModal()};
+const rrows=()=>{const g=i=>$(i).value,R=D.filter(r=>(!g('#rt')||r.tipo==g('#rt'))&&(!g('#rc')||r.categoria==g('#rc'))&&(!g('#re')||r.estado==g('#re'))&&(!g('#rd')||r.depto==g('#rd'))&&(!g('#rx')||r.estadoRep==g('#rx'))&&(!g('#r1')||r.fecha>=g('#r1'))&&(!g('#r2')||r.fecha<=g('#r2')));$('#rn').textContent=R.length+' movimiento(s) incluidos en el reporte';return R};
+['#rt','#rc','#re','#rd','#rx','#r1','#r2'].forEach(s=>$(s).oninput=rrows);$('#rgo').onclick=()=>pdf(rrows(),'rep');
+
+/* ---------- Ajustes ---------- */
+$('#gs').value=`/**
+ * Commission / Decommission - Backend en Google Sheets
+ * Pega este archivo en Extensiones > Apps Script de tu Google Sheet.
+ * Luego: Implementar > Nueva implementación > Aplicación web
+ *   - Ejecutar como: Yo
+ *   - Quién tiene acceso: Cualquier usuario
+ * Copia la URL que termina en /exec y pégala en Ajustes de index.htm.
+ */
+const SHEET_NAME = 'Movimientos';
+const FIELDS = ['id', 'tipo', 'categoria', 'activo', 'descripcion', 'depto', 'responsable',
+  'solicitante', 'estadoRep', 'fecha', 'estado', 'impacto', 'ticket', 'notas'];
+
+/** Ejecuta esta función una vez desde el editor para crear la hoja y autorizar permisos. */
+function setup() {
+  getSheet_();
+  SpreadsheetApp.getActive().toast('Hoja "' + SHEET_NAME + '" lista');
 }
 
-/* =========================================================
-   DATOS
-   ========================================================= */
-const DEPARTMENTS = [
-  { name:'Admon',              color:'#0a84ff', isVentas:false, positions:['Administrador de Oficina','Auxiliar Administrativo'] },
-  { name:'Admon y Finanzas',   color:'#5856d6', isVentas:false, positions:['Director de Administración y Finanzas'] },
-  { name:'DG',                 color:'#af52de', isVentas:false, positions:['Asistente de Dirección y Coord de eventos','Director de Operaciones','Director General'] },
-  { name:'Digital',            color:'#ff6b9d', isVentas:true,  positions:['Asesor Ventas Digitales'] },
-  { name:'Dir Médica',         color:'#34c759', isVentas:false, positions:['Coordinadora de Regulatoria','Director Médico','Gerente de Entrenamiento','Gerente Médico'] },
-  { name:'Finanzas',           color:'#ff9500', isVentas:false, positions:['Auxiliar de Tesorería','Contador','Cuentas por cobrar/facturación'] },
-  { name:'IT',                 color:'#00c7be', isVentas:false, positions:['Base de datos'] },
-  { name:'Logística',          color:'#ff9f0a', isVentas:false, positions:['Administrativo Logística','Auxiliar de Almacén','Encargado de Almacén','Jefe de Logística'] },
-  { name:'MKT',                color:'#ff3b30', isVentas:false, positions:['Asistente de Mercadotecnia','Director de Mercadotecnia','Diseñador Jr.','Diseñador Sr.','Especialista Comunicación Audiovisual','Especialista Senior de Mercadotecnia Digital','Gerente de Mercadotecnia Digital','Gerente de Producto Portafolio'] },
-  { name:'Recursos Humanos',   color:'#e91e63', isVentas:false, positions:['Gerente Recursos Humanos'] },
-  { name:'Servicios Generales',color:'#8e8e93', isVentas:false, positions:['Auxiliar Administrativo','Servicios generales'] },
-  { name:'Ventas',             color:'#ff2d55', isVentas:true,  positions:['Asesor de Ventas','Coordinadora Nacional de Ventas / Gerente Regional de Ventas','Gerente Regional de Ventas'] }
-];
-
-/* ---------- PERFIL ESTÁNDAR (no Ventas) ---------- */
-const SYSTEMS_STD_ALTA = [
-  { label:'Alta de correo Dermavan', icon:'mail', href:'https://cpanel.dermavan.mx/' }
-];
-const SYSTEMS_STD_BAJA = [
-  { label:'Baja correo Dermavan',    icon:'mail' }
-];
-
-/* ---------- PERFIL VENTAS ---------- */
-const SYSTEMS_VEN_ALTA = [
-  { label:'Alta correo Dermavan',          icon:'mail',      href:'https://cpanel.dermavan.mx/' },
-  { label:'Alta Dermavanlab',              icon:'cloud',     href:'https://dermavanlab.com/login/index.php' },
-  { label:'Alta usuario SAP',              icon:'briefcase', href:'mailto:basesdatos@dermavan.mx' },
-  { label:'Alta Cotizador SAP',            icon:'file',      href:'mailto:alfonso@bluesolut.com;noemi_coronilla@grupoatic.com.mx;alexis_vazquez@grupoatic.com.mx' },
-  { label:'Alta Gmail control médico',     icon:'mail' },
-  { label:'Alta CRM Harmony',              icon:'users',     href:'mailto:ntomas@smart-scale.com' }
-];
-const SYSTEMS_VEN_BAJA = [
-  { label:'Baja correo Dermavan',          icon:'mail' },
-  { label:'Baja Dermavanlab',              icon:'cloud' },
-  { label:'Baja usuario SAP',              icon:'briefcase' },
-  { label:'Baja Cotizador SAP',            icon:'file' },
-  { label:'Baja Gmail control médico',     icon:'mail' },
-  { label:'Baja CRM Harmony',              icon:'users' }
-];
-
-const DEVICES = [
-  { label:'Laptop',         icon:'laptop' },
-  { label:'Monitor',        icon:'monitor' },
-  { label:'Teléfono móvil', icon:'phone' },
-  { label:'iPhone',         icon:'phone' },
-  { label:'iPad',           icon:'tablet' },
-  { label:'Periférico',     icon:'keyboard' },
-  { label:'Otro',           icon:'box' }
-];
-
-/* =========================================================
-   RENDER
-   ========================================================= */
-function renderAltaChip(s){
-  if (s.href){
-    const isMail = s.href.startsWith('mailto:');
-    const target = isMail ? '' : ' target="_blank" rel="noopener noreferrer"';
-    return `<a class="sys-chip alta" href="${s.href}"${target}>${svg(s.icon)}${s.label}</a>`;
-  }
-  return `<span class="sys-chip alta">${svg(s.icon)}${s.label}</span>`;
-}
-
-function buildCard(dept){
-  const alta = dept.isVentas ? SYSTEMS_VEN_ALTA : SYSTEMS_STD_ALTA;
-  const baja = dept.isVentas ? SYSTEMS_VEN_BAJA : SYSTEMS_STD_BAJA;
-
-  const searchText = [
-    dept.name,
-    ...dept.positions,
-    ...alta.map(s=>s.label),
-    ...baja.map(s=>s.label),
-    ...DEVICES.map(d=>d.label)
-  ].join(' ').toLowerCase();
-
-  return `
-    <div class="card" data-search="${searchText}">
-      <div class="card-head">
-        <span class="dept-dot" style="background:${dept.color}"></span>
-        <div class="card-title-wrap">
-          <div class="card-title">
-            ${dept.name}
-            ${dept.isVentas ? '<span class="ventas-badge">VENTAS</span>' : ''}
-          </div>
-          <div class="positions">${dept.positions.join(' · ')}</div>
-        </div>
-      </div>
-
-      <div class="section alta-sec">
-        <div class="section-title alta">${svg('check')} Alta · habilitar (${alta.length})</div>
-        <div class="chips">
-          ${alta.map(renderAltaChip).join('')}
-        </div>
-      </div>
-
-      <div class="section baja-sec">
-        <div class="section-title baja">${svg('x')} Baja · deshabilitar (${baja.length})</div>
-        <div class="chips">
-          ${baja.map(s => `<span class="sys-chip baja">${svg(s.icon)}${s.label}</span>`).join('')}
-        </div>
-      </div>
-
-      <div class="section devices-sec">
-        <div class="section-title devices">${svg('box')} Dispositivos · asignar / recuperar</div>
-        <div class="devices-row">
-          ${DEVICES.map(d => `<span class="dev-item">${svg(d.icon)}${d.label}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function render(){
-  document.getElementById('grid').innerHTML = DEPARTMENTS.map(buildCard).join('');
-}
-
-/* =========================================================
-   FILTRO
-   ========================================================= */
-function filterCards(){
-  const q = document.getElementById('search-input').value.toLowerCase().trim();
-  const cards = [...document.querySelectorAll('.card')];
-  let visible = 0;
-
-  cards.forEach(card => {
-    const match = !q || card.dataset.search.includes(q);
-    card.style.display = match ? '' : 'none';
-    if (match) visible++;
-  });
-
-  const emptyEl = document.getElementById('empty-state');
-  if (visible === 0 && !emptyEl){
-    const el = document.createElement('div');
-    el.className = 'empty';
-    el.id = 'empty-state';
-    el.innerHTML = `${svg('search', 40)}<p>Sin resultados para "${q}"</p>`;
-    document.getElementById('grid').appendChild(el);
-  } else if (visible > 0 && emptyEl){
-    emptyEl.remove();
-  }
-}
-
-/* =========================================================
-   MODO (Altas / Bajas / Todo)
-   ========================================================= */
-function setMode(mode){
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.classList.remove('active', 'active-alta', 'active-baja');
-    if (btn.dataset.mode === mode){
-      if (mode === 'alta') btn.classList.add('active-alta');
-      else if (mode === 'baja') btn.classList.add('active-baja');
-      else btn.classList.add('active');
+/** Crea la hoja si no existe y agrega las columnas que falten (sin borrar datos). */
+function getSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+  const cols = sh.getLastColumn();
+  const head = cols ? sh.getRange(1, 1, 1, cols).getValues()[0].map(String) : [];
+  FIELDS.forEach(function (f) {
+    if (head.indexOf(f) < 0) {
+      sh.getRange(1, head.length + 1).setValue(f);
+      head.push(f);
     }
   });
-  document.body.classList.remove('mode-alta', 'mode-baja');
-  if (mode === 'alta') document.body.classList.add('mode-alta');
-  if (mode === 'baja') document.body.classList.add('mode-baja');
+  sh.getRange(1, 1, 1, head.length)
+    .setFontWeight('bold').setBackground('#0b1f4d').setFontColor('#ffffff');
+  sh.setFrozenRows(1);
+  return { sh: sh, head: head };
 }
 
-/* =========================================================
-   TEMA
-   ========================================================= */
-function toggleTheme(){
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('it-guide-theme', next); } catch(e) {}
-  updateThemeIcon();
-}
-function updateThemeIcon(){
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('theme-icon').innerHTML = svg(isDark ? 'sun' : 'moon', 20);
-  document.querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', isDark ? '#000000' : '#f2f2f7');
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
-/* =========================================================
-   REPORTE PDF (Alta / Baja / Cambio)
-   ========================================================= */
-const REP = { tipo:'alta', scope:'area' };
-const LOG_KEY = 'it-guide-log';
-let memLog = [];
-const $ = id => document.getElementById(id);
-const TIPO_TXT = { alta:'ALTA', baja:'BAJA', cambio:'CAMBIO' };
-const baseName = l => l.replace(/^(Alta|Baja)( de)?\s+/i,'').trim().toLowerCase();
-const getDept = n => DEPARTMENTS.find(d => d.name === n);
-const sysOf = (d,t) => d.isVentas ? (t==='alta'?SYSTEMS_VEN_ALTA:SYSTEMS_VEN_BAJA) : (t==='alta'?SYSTEMS_STD_ALTA:SYSTEMS_STD_BAJA);
-const detail = h => !h ? 'Gestion interna' : h.startsWith('mailto:') ? h.slice(7).split(';').join(', ') : h;
-const fmtDate = iso => { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
-const slug = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_|_$/g,'');
-
-function loadLog(){
-  try { return JSON.parse(localStorage.getItem(LOG_KEY)||'[]'); } catch(e){ return memLog; }
-}
-function saveLog(arr){
-  memLog = arr;
-  try { localStorage.setItem(LOG_KEY, JSON.stringify(arr)); } catch(e){}
-}
-
-/* Construye la lista de acciones según movimiento y áreas */
-function curItems(){
-  const o = getDept($('f-area').value);
-  const dst = getDept($('f-dest').value);
-  const items = [];
-  if (!o) return items;
-  if (REP.tipo === 'alta'){
-    sysOf(o,'alta').forEach(s => items.push({ app:s.label, acc:'ALTA', det:detail(s.href) }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'ASIGNAR', det:'Dispositivo' }));
-  } else if (REP.tipo === 'baja'){
-    sysOf(o,'baja').forEach(s => items.push({ app:s.label, acc:'BAJA', det:'Deshabilitar acceso' }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'RECUPERAR', det:'Dispositivo' }));
-  } else if (dst){
-    const keepD = sysOf(dst,'alta').map(s => baseName(s.label));
-    const keepO = sysOf(o,'alta').map(s => baseName(s.label));
-    sysOf(o,'baja').filter(s => !keepD.includes(baseName(s.label)))
-      .forEach(s => items.push({ app:s.label, acc:'BAJA', det:'Ya no aplica en ' + dst.name }));
-    sysOf(dst,'alta').filter(s => !keepO.includes(baseName(s.label)))
-      .forEach(s => items.push({ app:s.label, acc:'ALTA', det:detail(s.href) }));
-    DEVICES.forEach(d => items.push({ app:d.label, acc:'REVISAR', det:'Reasignar si aplica' }));
+function cell_(v) {
+  if (v instanceof Date) {
+    return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   }
-  return items;
+  return v === null || v === undefined ? '' : v;
 }
 
-function fillSelects(){
-  const opts = DEPARTMENTS.map(d => `<option>${d.name}</option>`).join('');
-  $('f-area').innerHTML = opts;
-  $('f-dest').innerHTML = opts;
-  if (DEPARTMENTS.length > 1) $('f-dest').selectedIndex = 1;
-  fillPuestos();
-}
-function fillPuestos(){
-  const d = getDept(REP.tipo==='cambio' ? $('f-dest').value : $('f-area').value);
-  $('f-puesto').innerHTML = (d ? d.positions : []).map(p => `<option>${p}</option>`).join('');
-}
-function renderChecklist(){
-  const items = curItems();
-  $('ckl').innerHTML = items.length
-    ? items.map((it,i) => `<label class="ck"><input type="checkbox" data-i="${i}"><b class="${it.acc}">${it.acc}</b><span>${it.app}</span></label>`).join('')
-    : '<p class="hint">Sin acciones para esta selección.</p>';
-  $('rep-hint').textContent = (REP.tipo==='cambio' && $('f-area').value===$('f-dest').value)
-    ? 'El área origen y destino son iguales: solo se mostrará la revisión de dispositivos.' : '';
-}
-function syncForm(){
-  const cambio = REP.tipo === 'cambio', emp = REP.scope === 'emp';
-  $('wrap-dest').hidden = !cambio;
-  $('wrap-emp').hidden = !emp;
-  $('lbl-area').textContent = cambio ? 'Área origen' : 'Área';
-  fillPuestos();
-  renderChecklist();
-}
-function segBind(id, key){
-  $(id).addEventListener('click', e => {
-    const b = e.target.closest('button'); if(!b) return;
-    REP[key] = b.dataset.v;
-    $(id).querySelectorAll('button').forEach(x => x.className = x===b ? 'on ' + (key==='tipo'?b.dataset.v:'') : '');
-    syncForm();
-  });
-}
-function openModal(){
-  $('rep-modal').hidden = false;
-  if (!$('f-fecha').value) $('f-fecha').value = new Date().toISOString().slice(0,10);
-  syncForm();
+/** Lee todos los movimientos (la app llama a esta función al abrir). */
+function doGet() {
+  const g = getSheet_();
+  const last = g.sh.getLastRow();
+  if (last < 2) return json_([]);
+  const values = g.sh.getRange(2, 1, last - 1, g.head.length).getValues();
+  const rows = values.map(function (r) {
+    const o = {};
+    g.head.forEach(function (k, i) { o[k] = cell_(r[i]); });
+    return o;
+  }).filter(function (o) { return o.id; });
+  return json_(rows);
 }
 
-/* Encabezado y pie comunes del PDF */
-function pdfFrame(doc, title, sub){
-  const W = doc.internal.pageSize.getWidth();
-  doc.setFillColor(10,132,255); doc.rect(0,0,W,26,'F');
-  doc.setFillColor(88,86,214); doc.rect(W*0.6,0,W*0.4,26,'F');
-  doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
-  doc.text(title, 14, 12);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-  doc.text(sub, 14, 19);
-  doc.text('Departamento de TI', W-14, 12, { align:'right' });
-  doc.text('Generado: ' + new Date().toLocaleString('es-MX'), W-14, 19, { align:'right' });
-  doc.setTextColor(0);
-}
-function pdfFooters(doc){
-  const n = doc.getNumberOfPages(), W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-  for (let i=1;i<=n;i++){
-    doc.setPage(i); doc.setFontSize(8); doc.setTextColor(130);
-    doc.setDrawColor(210); doc.line(14,H-12,W-14,H-12);
-    doc.text('CHECKLIST ABC · Altas y Bajas · Documento interno', 14, H-7);
-    doc.text(`Pagina ${i} de ${n}`, W-14, H-7, { align:'right' });
-  }
-}
-function accColor(a){
-  return a==='ALTA'||a==='ASIGNAR' ? [52,199,89] : a==='BAJA'||a==='RECUPERAR' ? [255,59,48] : [255,149,0];
-}
-function ensureLib(){
-  if (!(window.jspdf && window.jspdf.jsPDF)){
-    alert('No se pudo cargar la librería PDF (jsPDF). Verifica tu conexión a internet e inténtalo de nuevo.');
-    return false;
-  }
-  return true;
-}
-
-/* Genera el reporte del movimiento actual */
-function generatePDF(){
-  if (!ensureLib()) return;
-  const tipo = REP.tipo, emp = REP.scope === 'emp';
-  const nombre = $('f-nombre').value.trim();
-  if (emp && !nombre){ alert('Escribe el nombre del empleado.'); $('f-nombre').focus(); return; }
-  const o = getDept($('f-area').value), dst = getDept($('f-dest').value);
-  const items = curItems();
-  if (!items.length){ alert('No hay acciones para generar.'); return; }
-  const checks = [...document.querySelectorAll('#ckl input')].map(c => c.checked);
-  const fecha = fmtDate($('f-fecha').value), resp = $('f-resp').value.trim();
-  const puesto = emp ? $('f-puesto').value : '';
-  const hechos = checks.filter(Boolean).length;
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'letter' });
-  const W = doc.internal.pageSize.getWidth();
-  pdfFrame(doc, 'Reporte de ' + (tipo==='alta'?'Alta':tipo==='baja'?'Baja':'Cambio'),
-    'Control de accesos y dispositivos · ' + (emp ? 'Por empleado' : 'Por area'));
-
-  /* Bloque de datos */
-  const meta = [
-    ['Movimiento', TIPO_TXT[tipo]],
-    ['Alcance', emp ? 'Empleado' : 'Area'],
-    [tipo==='cambio' ? 'Area origen' : 'Area', o.name],
-  ];
-  if (tipo==='cambio') meta.push(['Area destino', dst.name]);
-  if (emp){ meta.push(['Empleado', nombre]); meta.push(['Puesto', puesto]); }
-  else meta.push(['Puestos del area', (tipo==='cambio'?dst:o).positions.join(' · ')]);
-  meta.push(['Fecha', fecha || '-'], ['Responsable TI', resp || '-']);
-  doc.autoTable({
-    startY:32, body:meta, theme:'plain', margin:{ left:14, right:14 },
-    styles:{ fontSize:9.5, cellPadding:1.8 },
-    columnStyles:{ 0:{ fontStyle:'bold', textColor:[108,108,112], cellWidth:38 } },
-  });
-
-  /* Resumen */
-  let y = doc.lastAutoTable.finalY + 4;
-  doc.setFillColor(242,242,247); doc.roundedRect(14,y,W-28,13,2,2,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  const verbo = tipo==='alta' ? 'dados de alta' : tipo==='baja' ? 'dados de baja' : 'procesados';
-  doc.text(`Listado de elementos ${verbo}: ${hechos} de ${items.length} realizados · ${items.length-hechos} pendientes`, 18, y+8);
-
-  /* Tabla principal */
-  const body = items.map((it,i) => [i+1, it.app, it.acc, it.det, checks[i] ? 'Realizado' : 'Pendiente', '']);
-  doc.autoTable({
-    startY:y+18, margin:{ left:14, right:14, bottom:18 },
-    head:[['#','Sistema / App / Dispositivo','Accion','Enlace / Contacto / Detalle','Estatus','Hecho']],
-    body, theme:'grid',
-    headStyles:{ fillColor:[10,132,255], textColor:255, fontSize:9 },
-    styles:{ fontSize:8.5, cellPadding:2.4, valign:'middle', overflow:'linebreak' },
-    alternateRowStyles:{ fillColor:[248,248,251] },
-    columnStyles:{ 0:{cellWidth:8,halign:'center'}, 1:{cellWidth:50}, 2:{cellWidth:22,halign:'center',fontStyle:'bold'}, 4:{cellWidth:22,halign:'center'}, 5:{cellWidth:14} },
-    didParseCell(d){
-      if (d.section!=='body') return;
-      if (d.column.index===2) d.cell.styles.textColor = accColor(d.cell.raw);
-      if (d.column.index===4) d.cell.styles.textColor = checks[d.row.index] ? [52,150,80] : [255,149,0];
-    },
-    didDrawCell(d){
-      if (d.section!=='body' || d.column.index!==5) return;
-      const s = 4, cx = d.cell.x + (d.cell.width-s)/2, cy = d.cell.y + (d.cell.height-s)/2;
-      doc.setDrawColor(90); doc.setLineWidth(.3); doc.rect(cx,cy,s,s);
-      if (checks[d.row.index]){
-        doc.setDrawColor(52,199,89); doc.setLineWidth(.7);
-        doc.line(cx+.8,cy+2.2,cx+1.7,cy+3.2); doc.line(cx+1.7,cy+3.2,cx+3.3,cy+.8);
+/** Crea, actualiza o elimina un movimiento. */
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const d = JSON.parse(e.postData.contents);
+    const g = getSheet_();
+    const idCol = g.head.indexOf('id') + 1;
+    const last = g.sh.getLastRow();
+    let rowIdx = -1;
+    if (last > 1) {
+      const ids = g.sh.getRange(2, idCol, last - 1, 1).getValues();
+      for (let i = 0; i < ids.length; i++) {
+        if (String(ids[i][0]) === String(d.row.id)) { rowIdx = i + 2; break; }
       }
     }
-  });
-
-  /* Firmas */
-  let fy = doc.lastAutoTable.finalY + 26;
-  const H = doc.internal.pageSize.getHeight();
-  if (fy > H-30){ doc.addPage(); fy = 40; }
-  doc.setDrawColor(120); doc.setLineWidth(.3);
-  doc.line(20,fy,85,fy); doc.line(W-85,fy,W-20,fy);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(90);
-  doc.text('Responsable de TI' + (resp ? ': ' + resp : ''), 52.5, fy+5, { align:'center' });
-  doc.text(emp ? 'Empleado: ' + nombre : 'Jefe de area / Recursos Humanos', W-52.5, fy+5, { align:'center' });
-
-  pdfFooters(doc);
-  doc.save(`Reporte_${TIPO_TXT[tipo]}_${slug(emp ? nombre : o.name)}_${new Date().toISOString().slice(0,10)}.pdf`);
-
-  /* Guardar en historial */
-  const log = loadLog();
-  log.push({
-    fecha: $('f-fecha').value || new Date().toISOString().slice(0,10), tipo, area:o.name,
-    destino: tipo==='cambio' ? dst.name : '', nombre: emp ? nombre : '', puesto,
-    total: items.length, hechos,
-    apps: items.filter((_,i)=>checks[i]).map(i => i.app)
-  });
-  saveLog(log);
-  saveLast({
-    tipo, emp, nombre, area:o.name, destino: tipo==='cambio' ? dst.name : '', puesto,
-    fecha: $('f-fecha').value, resp,
-    items: items.map((it,i) => ({ ...it, done:!!checks[i] }))
-  });
-}
-
-/* PDF del historial de movimientos, filtrado por movimiento / área / nombre */
-function historyPDF(){
-  if (!ensureLib()) return;
-  const area = $('f-area').value, q = $('f-nombre').value.trim().toLowerCase(), emp = REP.scope === 'emp';
-  let rows = loadLog().filter(r => r.tipo === REP.tipo);
-  rows = emp
-    ? rows.filter(r => !q || r.nombre.toLowerCase().includes(q))
-    : rows.filter(r => r.area === area || r.destino === area);
-  if (!rows.length){ alert('No hay movimientos de ' + TIPO_TXT[REP.tipo] + ' registrados con ese filtro.'); return; }
-  rows.sort((a,b) => a.fecha < b.fecha ? 1 : -1);
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'letter', orientation:'landscape' });
-  const verbo = REP.tipo==='alta' ? 'dados de alta' : REP.tipo==='baja' ? 'dados de baja' : 'con cambio';
-  pdfFrame(doc, 'Historial de ' + TIPO_TXT[REP.tipo],
-    'Listado de empleados / areas ' + verbo + ' · Filtro: ' + (emp ? (q || 'todos los empleados') : area));
-  doc.autoTable({
-    startY:32, margin:{ left:14, right:14, bottom:18 }, theme:'grid',
-    head:[['Fecha','Movimiento','Empleado / Area','Puesto','Avance','Apps realizadas']],
-    body: rows.map(r => [
-      fmtDate(r.fecha), TIPO_TXT[r.tipo],
-      (r.nombre ? r.nombre + ' · ' : '') + r.area + (r.destino ? ' -> ' + r.destino : ''),
-      r.puesto || '-', `${r.hechos}/${r.total}`, r.apps.length ? r.apps.join(', ') : 'Ninguna marcada'
-    ]),
-    headStyles:{ fillColor:[10,132,255], textColor:255, fontSize:9 },
-    styles:{ fontSize:8.5, cellPadding:2.4 },
-    alternateRowStyles:{ fillColor:[248,248,251] },
-    columnStyles:{ 0:{cellWidth:22}, 1:{cellWidth:24,fontStyle:'bold'}, 4:{cellWidth:18,halign:'center'} },
-    didParseCell(d){ if (d.section==='body' && d.column.index===1) d.cell.styles.textColor = accColor(d.cell.raw==='CAMBIO'?'REVISAR':d.cell.raw); }
-  });
-  pdfFooters(doc);
-  doc.save(`Historial_${TIPO_TXT[REP.tipo]}_${new Date().toISOString().slice(0,10)}.pdf`);
-}
-
-/* ===== CORREO AL EQUIPO ===== */
-const LAST_KEY = 'it-guide-last';
-let memLast = null;
-function saveLast(r){ memLast = r; try { localStorage.setItem(LAST_KEY, JSON.stringify(r)); } catch(e){} }
-function loadLast(){ try { return JSON.parse(localStorage.getItem(LAST_KEY) || 'null') || memLast; } catch(e){ return memLast; } }
-
-function formSnapshot(){
-  const o = getDept($('f-area').value), dst = getDept($('f-dest').value), items = curItems();
-  if (!o || !items.length) return null;
-  const checks = [...document.querySelectorAll('#ckl input')].map(c => c.checked);
-  const emp = REP.scope === 'emp';
-  return {
-    tipo:REP.tipo, emp, nombre: emp ? $('f-nombre').value.trim() : '', area:o.name,
-    destino: REP.tipo==='cambio' ? dst.name : '', puesto: emp ? $('f-puesto').value : '',
-    fecha: $('f-fecha').value, resp: $('f-resp').value.trim(),
-    items: items.map((it,i) => ({ ...it, done:!!checks[i] }))
-  };
-}
-
-const MAIL_GROUPS = [
-  ['ALTA','Accesos dados de alta'], ['BAJA','Accesos dados de baja'],
-  ['ASIGNAR','Dispositivos asignados'], ['RECUPERAR','Dispositivos recuperados'],
-  ['REVISAR','Dispositivos por revisar / reasignar']
-];
-const MAIL_ART = { alta:'el ALTA', baja:'la BAJA', cambio:'el CAMBIO' };
-
-function buildMail(r){
-  const T = TIPO_TXT[r.tipo];
-  const fecha = fmtDate(r.fecha) || new Date().toLocaleDateString('es-MX');
-  const nom = r.nombre || '(nombre pendiente)';
-  const nm = r.emp ? `de ${nom}${r.puesto ? ` (${r.puesto})` : ''}` : `del área ${r.area}`;
-  const ar = r.tipo==='cambio'
-    ? (r.emp ? ` del área ${r.area}` : '') + ` al área ${r.destino}`
-    : (r.emp ? `, área ${r.area}` : '');
-  const base = r.tipo==='cambio'
-    ? (r.emp ? `${nom} · ${r.area} → ${r.destino}` : `Área ${r.area} → ${r.destino}`)
-    : (r.emp ? `${nom} · ${r.area}` : `Área ${r.area}`);
-  const subject = `[${T}] ${base} · ${fecha}`;
-
-  const total = r.items.length, hechos = r.items.filter(i => i.done).length, pend = total - hechos;
-  const L = [];
-  L.push('Hola equipo,', '');
-  L.push(`Les informo que se realizó ${MAIL_ART[r.tipo]} ${nm}${ar}.`, '');
-  L.push('Datos del movimiento:');
-  L.push(`• Movimiento: ${T}`);
-  if (r.emp){ L.push(`• Empleado: ${nom}`); if (r.puesto) L.push(`• Puesto: ${r.puesto}`); }
-  L.push(r.tipo==='cambio' ? `• Área origen: ${r.area}` : `• Área: ${r.area}`);
-  if (r.tipo==='cambio') L.push(`• Área destino: ${r.destino}`);
-  L.push(`• Fecha: ${fecha}`);
-  if (r.resp) L.push(`• Responsable de TI: ${r.resp}`);
-  L.push('', 'Detalle por sistema / dispositivo:', '');
-  MAIL_GROUPS.forEach(([k,t]) => {
-    const g = r.items.filter(i => i.acc === k);
-    if (!g.length) return;
-    L.push(t + ':');
-    g.forEach(i => L.push(`  ${i.done ? '✔' : '☐'} ${i.app}${i.done ? '' : ' (pendiente)'}`));
-    L.push('');
-  });
-  L.push(`Avance: ${hechos} de ${total} elementos realizados.`);
-  if (pend) L.push(`Quedan ${pend} pendiente(s); les avisaré al concluirlos.`);
-  L.push('', 'Se adjunta el reporte PDF con el detalle completo.', '', 'Quedo atento a cualquier comentario.', '', 'Saludos,');
-  if (r.resp) L.push(r.resp);
-  L.push('Departamento de TI');
-  return { subject, body: L.join('\n') };
-}
-
-function mailRecipients(r){
-  const set = new Set();
-  r.items.filter(i => i.acc === 'ALTA').forEach(i => (i.det.match(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g) || []).forEach(e => set.add(e)));
-  return [...set].join(', ');
-}
-
-function fillMail(r, srcText){
-  const m = buildMail(r);
-  $('m-subj').value = m.subject;
-  $('m-body').value = m.body;
-  $('m-to').value = mailRecipients(r);
-  $('mail-src').textContent = srcText;
-}
-function openMail(){
-  const r = loadLast();
-  if (r) fillMail(r, 'Basado en el último PDF generado (' + TIPO_TXT[r.tipo] + ')');
-  else {
-    const f = formSnapshot();
-    if (!f){ alert('Primero genera un reporte PDF o selecciona un movimiento.'); return; }
-    fillMail(f, 'Basado en la selección actual (aún no hay PDF generado)');
-  }
-  $('mail-modal').hidden = false;
-}
-function copyMail(){
-  const txt = 'Asunto: ' + $('m-subj').value + '\n\n' + $('m-body').value;
-  const done = () => { const b = $('m-copy'); b.textContent = 'Copiado ✔'; setTimeout(() => b.textContent = 'Copiar', 1600); };
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(done).catch(() => alert('No se pudo copiar. Selecciona el texto manualmente.'));
-  } else {
-    $('m-body').select(); try { document.execCommand('copy'); done(); } catch(e){}
+    if (d.action === 'delete') {
+      if (rowIdx > 0) g.sh.deleteRow(rowIdx);
+    } else {
+      const line = g.head.map(function (k) {
+        return d.row[k] === undefined || d.row[k] === null ? '' : d.row[k];
+      });
+      const target = rowIdx > 0 ? rowIdx : last + 1;
+      const range = g.sh.getRange(target, 1, 1, g.head.length);
+      range.setNumberFormat('@'); // guarda fechas como texto (yyyy-mm-dd)
+      range.setValues([line]);
+    }
+    return json_({ ok: true });
+  } catch (err) {
+    return json_({ ok: false, error: String(err) });
+  } finally {
+    lock.releaseLock();
   }
 }
-function openMailto(){
-  const nl = s => s.replace(/\r?\n/g, '\r\n');
-  const q = [];
-  if ($('m-cc').value.trim()) q.push('cc=' + encodeURIComponent($('m-cc').value.trim()));
-  q.push('subject=' + encodeURIComponent($('m-subj').value));
-  q.push('body=' + encodeURIComponent(nl($('m-body').value)));
-  window.location.href = 'mailto:' + encodeURIComponent($('m-to').value.trim()).replace(/%2C|%20/g, m => m === '%2C' ? ',' : '') + '?' + q.join('&');
-}
-function initMail(){
-  $('mail-icon').innerHTML = svg('mail', 20);
-  $('mail-close-icon').innerHTML = svg('x', 20);
-  $('mail-btn').addEventListener('click', openMail);
-  $('mail-close').addEventListener('click', () => $('mail-modal').hidden = true);
-  $('mail-modal').addEventListener('click', e => { if (e.target.id === 'mail-modal') $('mail-modal').hidden = true; });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('mail-modal').hidden = true; });
-  $('m-regen').addEventListener('click', () => {
-    const f = formSnapshot();
-    if (!f){ alert('No hay acciones en la selección actual del reporte.'); return; }
-    fillMail(f, 'Basado en la selección actual del reporte');
-  });
-  $('m-copy').addEventListener('click', copyMail);
-  $('m-open').addEventListener('click', openMailto);
-}
+`;
+$('#gcp').onclick=()=>navigator.clipboard.writeText($('#gs').value).then(()=>toast('Código copiado'));
+$('#cfgb').onclick=()=>{$('#cco').value=C.co;$('#car').value=C.ar;$('#cem').value=C.em;$('#cur').value=C.url;$('#dc').showModal()};
+$('#csv').onclick=()=>{C={co:$('#cco').value.trim()||'Mi empresa',ar:$('#car').value.trim()||'Tecnologías de la Información',em:$('#cem').value.trim(),url:$('#cur').value.trim()};localStorage.setItem(K+'c',JSON.stringify(C));$('#dc').close();load();toast('Ajustes guardados')};
 
-function initReport(){
-  $('pdf-icon').innerHTML = svg('pdf', 20);
-  $('rep-close-icon').innerHTML = svg('x', 20);
-  fillSelects();
-  segBind('seg-tipo','tipo');
-  segBind('seg-scope','scope');
-  $('pdf-btn').addEventListener('click', openModal);
-  initMail();
-  $('rep-close').addEventListener('click', () => $('rep-modal').hidden = true);
-  $('rep-modal').addEventListener('click', e => { if (e.target.id === 'rep-modal') $('rep-modal').hidden = true; });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('rep-modal').hidden = true; });
-  $('f-area').addEventListener('change', () => { fillPuestos(); renderChecklist(); });
-  $('f-dest').addEventListener('change', () => { fillPuestos(); renderChecklist(); });
-  $('gen-pdf').addEventListener('click', generatePDF);
-  $('hist-pdf').addEventListener('click', historyPDF);
-  $('hist-clear').addEventListener('click', () => {
-    if (confirm('¿Borrar todo el historial de movimientos?')) saveLog([]);
-  });
-}
-
-/* =========================================================
-   INIT
-   ========================================================= */
-function init(){
-  try {
-    const saved = localStorage.getItem('it-guide-theme');
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
-  } catch(e){}
-
-  document.getElementById('brand-logo').innerHTML = svg('shield', 20);
-  document.getElementById('print-icon').innerHTML = svg('printer', 20);
-  document.getElementById('search-icon').innerHTML = svg('search', 18);
-  updateThemeIcon();
-
-  document.getElementById('hero-stats').innerHTML = `
-    <div class="hstat"><span class="hstat-val">${DEPARTMENTS.length}</span><span class="hstat-label">Departamentos</span></div>
-    <div class="hstat"><span class="hstat-val">2</span><span class="hstat-label">Perfiles</span></div>
-    <div class="hstat"><span class="hstat-val">${DEVICES.length}</span><span class="hstat-label">Dispositivos</span></div>
-  `;
-
-  render();
-
-  document.getElementById('search-input').addEventListener('input', filterCards);
-  document.getElementById('print-btn').addEventListener('click', () => window.print());
-  document.getElementById('theme-btn').addEventListener('click', toggleTheme);
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => setMode(btn.dataset.mode));
-  });
-  initReport();
-}
-init();
-</script>
-</body>
-</html>
+function render(){$('#co').textContent=C.co+' · altas, bajas y cambios';dash();list()}
+document.documentElement.dataset.t=localStorage.getItem(K+'t')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+load();
+</script></body></html>
 
